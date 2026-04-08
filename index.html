@@ -7,78 +7,107 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
-    .header { background: #1a3a2a; color: white; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .header h1 { font-size: 1.4rem; font-weight: 600; }
-    .header p { font-size: 0.85rem; opacity: 0.7; margin-top: 2px; }
-    .header-right { text-align: right; font-size: 0.85rem; opacity: 0.8; }
-    .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
-    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .header { background: #1a3a2a; color: white; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.3rem; font-weight: 600; }
+    .header p { font-size: 0.8rem; opacity: 0.7; margin-top: 2px; }
+    .header-right { text-align: right; font-size: 0.8rem; opacity: 0.8; }
+    .container { max-width: 1500px; margin: 0 auto; padding: 1.25rem; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
     .metric { background: white; border-radius: 10px; padding: 1rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .metric .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
     .metric .value { font-size: 22px; font-weight: 600; color: #1a3a2a; }
     .metric .sub { font-size: 11px; color: #aaa; margin-top: 2px; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
     .card { background: white; border-radius: 10px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 1rem; }
     .card h2 { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #1a3a2a; }
     .card .subtitle { font-size: 11px; color: #aaa; margin-bottom: 12px; }
     .top-pick { background: #1a3a2a; color: white; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
-    .top-pick h2 { font-size: 12px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .top-pick h2 { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
     .top-pick .name { font-size: 1.4rem; font-weight: 700; }
     .top-pick .detail { font-size: 13px; opacity: 0.8; margin-top: 4px; }
-    .top-pick .badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .top-pick .tp-badge { background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
     .badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-left: 4px; }
     .badge-green { background: #e8f5e9; color: #2e7d32; }
     .badge-blue { background: #e3f2fd; color: #1565c0; }
     .badge-amber { background: #fff8e1; color: #f57f17; }
     .badge-red { background: #ffebee; color: #c62828; }
-    .used-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .used-chip { background: #f9f9f9; border: 1px solid #eee; border-radius: 8px; padding: 6px 8px; font-size: 11px; color: #666; }
-    .used-chip strong { display: block; font-size: 11px; color: #333; font-weight: 600; }
-    .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
     .tab { font-size: 12px; padding: 5px 14px; border-radius: 6px; border: 1px solid #e0e0e0; background: white; cursor: pointer; color: #666; }
     .tab.active { background: #1a3a2a; color: white; border-color: #1a3a2a; font-weight: 600; }
-    .filter-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-    .filter-row label { font-size: 12px; color: #888; }
-    .filter-row select { font-size: 12px; padding: 5px 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; font-size: 11px; color: #888; font-weight: 600; padding: 6px 10px; border-bottom: 2px solid #f0f0f0; white-space: nowrap; }
-    th:hover { color: #1a3a2a; background: #f5f5f5; }
-    th span { font-size: 9px; margin-left: 2px; color: #1a3a2a; }
-    td { padding: 8px 10px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .toolbar label { font-size: 12px; color: #888; }
+    .toolbar select { font-size: 12px; padding: 5px 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; }
+    .toolbar button { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 1px solid #e0e0e0; background: white; cursor: pointer; color: #444; }
+    .toolbar button:hover { background: #f5f5f5; }
+    .toolbar button.btn-primary { background: #1a3a2a; color: white; border-color: #1a3a2a; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; font-size: 11px; color: #888; font-weight: 600; padding: 6px 8px; border-bottom: 2px solid #f0f0f0; white-space: nowrap; cursor: pointer; user-select: none; }
+    th:hover { color: #1a3a2a; background: #f9f9f9; }
+    th span.sort-arrow { font-size: 9px; margin-left: 2px; color: #1a3a2a; }
+    th.no-sort { cursor: default; }
+    th.no-sort:hover { color: #888; background: transparent; }
+    td { padding: 7px 8px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
     tr:hover td { background: #fafafa; }
-    tr.used td { opacity: 0.4; }
+    tr.used td { opacity: 0.35; }
     tr.top5 td { background: #f0f7f0; }
-    .dna-bar { height: 6px; border-radius: 3px; background: #f0f0f0; width: 70px; display: inline-block; vertical-align: middle; overflow: hidden; }
+    .dna-bar { height: 5px; border-radius: 3px; background: #f0f0f0; width: 50px; display: inline-block; vertical-align: middle; overflow: hidden; }
     .dna-fill { height: 100%; border-radius: 3px; background: #1a3a2a; }
-    .odds { font-weight: 600; }
-    .odds.plus { color: #2e7d32; }
-    .odds.minus { color: #c62828; }
-    .bet-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
-    .bet-row:last-child { border-bottom: none; }
     .loading { text-align: center; padding: 3rem; color: #888; }
     .spinner { width: 32px; height: 32px; border: 3px solid #f0f0f0; border-top-color: #1a3a2a; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .error { background: #ffebee; border: 1px solid #ffcdd2; border-radius: 8px; padding: 12px 16px; color: #c62828; font-size: 13px; margin-bottom: 1rem; }
-    .summary-card { background: white; border-radius: 10px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 1rem; }
-    .summary-rank { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .summary-rank { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
     .summary-rank:last-child { border-bottom: none; }
-    .rank-num { width: 32px; height: 32px; border-radius: 50%; background: #1a3a2a; color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .rank-num { width: 30px; height: 30px; border-radius: 50%; background: #1a3a2a; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
     .rank-num.gold { background: #B8860B; }
     .rank-num.silver { background: #888; }
     .rank-num.bronze { background: #8B4513; }
     .rank-info { flex: 1; }
-    .rank-name { font-size: 14px; font-weight: 600; }
+    .rank-name { font-size: 13px; font-weight: 600; }
     .rank-stats { font-size: 11px; color: #888; margin-top: 2px; }
-    .rank-rec { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+    .rank-rec { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 6px; white-space: nowrap; }
     .rec-strong { background: #e8f5e9; color: #2e7d32; }
     .rec-good { background: #e3f2fd; color: #1565c0; }
     .rec-consider { background: #fff8e1; color: #f57f17; }
     .rec-used { background: #ffebee; color: #c62828; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .bet-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f5f5; }
+    .bet-row:last-child { border-bottom: none; }
+    .odds.plus { color: #2e7d32; font-weight: 600; }
+    .odds.minus { color: #c62828; font-weight: 600; }
+    /* Column picker modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    .modal { background: white; border-radius: 12px; padding: 1.5rem; width: 560px; max-width: 95vw; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    .modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: #1a3a2a; }
+    .modal .modal-sub { font-size: 12px; color: #888; margin-bottom: 16px; }
+    .col-group { margin-bottom: 16px; }
+    .col-group-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .col-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid #eee; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .col-item:hover { background: #f9f9f9; }
+    .col-item input { cursor: pointer; accent-color: #1a3a2a; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+    /* Used player picker */
+    .used-mgr { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .used-list { display: flex; flex-direction: column; gap: 4px; max-height: 400px; overflow-y: auto; }
+    .used-player-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 6px; border: 1px solid #eee; font-size: 12px; }
+    .used-player-item.is-used { background: #fff0f0; border-color: #ffd0d0; }
+    .used-player-item button { font-size: 10px; padding: 2px 8px; border-radius: 4px; border: none; cursor: pointer; }
+    .btn-mark-used { background: #c62828; color: white; }
+    .btn-mark-used:hover { background: #a31f1f; }
+    .btn-unmark { background: #e0e0e0; color: #444; }
+    .btn-unmark:hover { background: #ccc; }
+    .used-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .used-chip { background: #ffebee; border: 1px solid #ffcdd2; border-radius: 6px; padding: 4px 10px; font-size: 12px; color: #c62828; display: flex; align-items: center; gap: 6px; }
+    .used-chip button { background: none; border: none; cursor: pointer; color: #c62828; font-size: 14px; line-height: 1; padding: 0; }
+    .search-box { width: 100%; padding: 7px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; margin-bottom: 8px; }
+    .action-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 4px 10px; border-radius: 5px; border: 1px solid #e0e0e0; background: white; cursor: pointer; color: #444; }
+    .action-btn:hover { background: #f5f5f5; }
+    .action-btn.danger { color: #c62828; border-color: #ffcdd2; }
     @media (max-width: 768px) {
       .metrics { grid-template-columns: repeat(2, 1fr); }
       .grid2 { grid-template-columns: 1fr; }
-      .used-grid { grid-template-columns: repeat(2, 1fr); }
-      .container { padding: 1rem; }
+      .used-mgr { grid-template-columns: 1fr; }
+      .col-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -86,7 +115,7 @@
 
 <div class="header">
   <div>
-    <h1>PGA One & Done Dashboard</h1>
+    <h1>PGA One &amp; Done Dashboard</h1>
     <p id="eventName">Loading current tournament...</p>
   </div>
   <div class="header-right">
@@ -104,243 +133,307 @@
 
   <div id="mainContent" style="display:none;">
     <div class="metrics">
-      <div class="metric">
-        <div class="label">Tournament</div>
-        <div class="value" id="mEvent" style="font-size:14px;padding-top:4px;">—</div>
-      </div>
-      <div class="metric">
-        <div class="label">Course</div>
-        <div class="value" id="mCourse" style="font-size:14px;padding-top:4px;">—</div>
-      </div>
-      <div class="metric">
-        <div class="label">Field size</div>
-        <div class="value" id="mField">—</div>
-      </div>
-      <div class="metric">
-        <div class="label">Players used</div>
-        <div class="value">12</div>
-        <div class="sub">locked this season</div>
-      </div>
+      <div class="metric"><div class="label">Tournament</div><div class="value" id="mEvent" style="font-size:13px;padding-top:4px;">—</div></div>
+      <div class="metric"><div class="label">Course</div><div class="value" id="mCourse" style="font-size:13px;padding-top:4px;">—</div></div>
+      <div class="metric"><div class="label">Field size</div><div class="value" id="mField">—</div></div>
+      <div class="metric"><div class="label">Players used</div><div class="value" id="mUsed">0</div><div class="sub">this season</div></div>
     </div>
 
-    <div id="topPickBox" class="top-pick">
+    <div class="top-pick">
       <div>
-        <h2>This week's One & Done pick</h2>
+        <h2>This week's One &amp; Done pick</h2>
         <div class="name" id="topPickName">—</div>
         <div class="detail" id="topPickDetail">—</div>
       </div>
-      <div class="badge" id="topPickBadge">—</div>
+      <div class="tp-badge" id="topPickBadge">—</div>
     </div>
 
     <div class="tabs">
       <button class="tab active" onclick="showTab('summary')">My Picks</button>
       <button class="tab" onclick="showTab('field')">Full Field</button>
       <button class="tab" onclick="showTab('betting')">Betting</button>
-      <button class="tab" onclick="showTab('used')">Used Players</button>
+      <button class="tab" onclick="showTab('used')">Manage Used Players</button>
     </div>
 
+    <!-- MY PICKS TAB -->
     <div id="tab-summary">
-      <div class="summary-card">
-        <div style="font-size:13px;color:#888;margin-bottom:12px;">Top available picks ranked by Win % + DNA Match Score. Used players excluded.</div>
+      <div class="card">
+        <div style="font-size:12px;color:#888;margin-bottom:12px;">Top available picks ranked by Win % + DNA Match Score. Used players excluded.</div>
         <div id="summaryList"></div>
       </div>
     </div>
 
+    <!-- FULL FIELD TAB -->
     <div id="tab-field" style="display:none;">
       <div class="card">
-        <div class="filter-row">
+        <div class="toolbar">
           <label>Show:</label>
           <select id="fFilter" onchange="renderTable()">
             <option value="all">All players</option>
             <option value="avail">Available only</option>
             <option value="top25">Top 25 only</option>
           </select>
-          <label>Sort by:</label>
-          <select id="fSort" onchange="renderTable()">
-            <option value="win">Win %</option>
-            <option value="top10">Top 10 %</option>
-            <option value="dna">DNA Match Score</option>
-            <option value="make_cut">Make Cut %</option>
-          </select>
+          <button onclick="openColumnPicker()" class="btn-primary" style="background:#1a3a2a;color:white;border-color:#1a3a2a;font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid;cursor:pointer;">&#9881; Customize columns</button>
         </div>
         <div style="overflow-x:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th onclick="sortTable('rank')" style="cursor:pointer;user-select:none;">Rank <span id="sort-rank"></span></th>
-                <th onclick="sortTable('name')" style="cursor:pointer;user-select:none;">Player <span id="sort-name"></span></th>
-                <th onclick="sortTable('win')" style="cursor:pointer;user-select:none;">Win % <span id="sort-win">&#9660;</span></th>
-                <th onclick="sortTable('top5')" style="cursor:pointer;user-select:none;">Top 5 % <span id="sort-top5"></span></th>
-                <th onclick="sortTable('top10')" style="cursor:pointer;user-select:none;">Top 10 % <span id="sort-top10"></span></th>
-                <th onclick="sortTable('top20')" style="cursor:pointer;user-select:none;">Top 20 % <span id="sort-top20"></span></th>
-                <th onclick="sortTable('make_cut')" style="cursor:pointer;user-select:none;">Make Cut % <span id="sort-make_cut"></span></th>
-                <th onclick="sortTable('fit')" style="cursor:pointer;user-select:none;">Course Fit <span id="sort-fit"></span></th>
-                <th onclick="sortTable('history')" style="cursor:pointer;user-select:none;">Course History <span id="sort-history"></span></th>
-                <th onclick="sortTable('dna')" style="cursor:pointer;user-select:none;">DNA Score <span id="sort-dna"></span></th>
-                <th>Status</th>
-              </tr>
-            </thead>
+          <table id="mainTable">
+            <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
           </table>
         </div>
       </div>
     </div>
 
+    <!-- BETTING TAB -->
     <div id="tab-betting" style="display:none;">
       <div class="grid2">
         <div class="card">
-          <h2>Win market value picks</h2>
-          <div class="subtitle">Model probability vs implied odds</div>
+          <h2>Win market — model vs book</h2>
+          <div class="subtitle">DataGolf probability vs DraftKings implied odds</div>
           <div id="betsList"></div>
-          <p style="font-size:10px;color:#aaa;margin-top:10px;">+EV = DataGolf model probability exceeds sportsbook implied probability. Bet responsibly.</p>
+          <p style="font-size:10px;color:#aaa;margin-top:10px;">+EV = model probability exceeds sportsbook implied probability. Bet responsibly.</p>
         </div>
         <div class="card">
-          <h2>Matchup recommendations</h2>
-          <div class="subtitle">Best head to head bets based on model edge</div>
-          <div id="matchupsList"></div>
+          <h2>Top value bets</h2>
+          <div class="subtitle">Highest positive edge vs DraftKings</div>
+          <div id="evList"></div>
         </div>
       </div>
     </div>
 
+    <!-- USED PLAYERS TAB -->
     <div id="tab-used" style="display:none;">
       <div class="card">
-        <h2>Your used players this season</h2>
-        <div class="subtitle">These 12 players are locked out for the rest of your One & Done season</div>
-        <div class="used-grid" id="usedGrid"></div>
+        <h2>Manage used players</h2>
+        <div class="subtitle">Mark players as used — they will be greyed out and excluded from your picks</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="action-btn danger" onclick="clearAllUsed()">&#10005; Clear all used players</button>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px;">Currently used (<span id="usedCount">0</span>)</div>
+        <div class="used-chips" id="usedChips" style="margin-bottom:16px;min-height:32px;"></div>
+        <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px;">Full field — click to toggle</div>
+        <input type="text" class="search-box" id="usedSearch" placeholder="Search players..." oninput="renderUsedManager()">
+        <div class="used-list" id="usedManagerList"></div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- COLUMN PICKER MODAL -->
+<div class="modal-overlay" id="colModal" style="display:none;" onclick="closeColModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>Customize columns</h3>
+    <div class="modal-sub">Toggle columns on or off. Drag to reorder (coming soon).</div>
+    <div id="colPickerGroups"></div>
+    <div class="modal-footer">
+      <button onclick="resetColumns()" style="font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #e0e0e0;background:white;cursor:pointer;">Reset to default</button>
+      <button onclick="closeColModal()" style="font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #1a3a2a;background:#1a3a2a;color:white;cursor:pointer;">Done</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const USED = [
-  "Ben Griffin","Si Woo Kim","Jason Day","Pierceson Coody",
-  "Justin Rose","Matthew Fitzpatrick","Rasmus Hojgaard",
-  "Rory McIlroy","Sepp Straka","Viktor Hovland",
-  "Jake Knapp","Robert MacIntyre"
+// ── COLUMN DEFINITIONS ──────────────────────────────────────────
+const ALL_COLUMNS = [
+  // Predictions
+  { key: 'rank',     label: 'Rank',            group: 'Predictions', default: true,  fmt: v => v },
+  { key: 'name',     label: 'Player',          group: 'Predictions', default: true,  fmt: v => v, noSort: false },
+  { key: 'win',      label: 'Win %',           group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
+  { key: 'top5',     label: 'Top 5 %',         group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
+  { key: 'top10',    label: 'Top 10 %',        group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
+  { key: 'top20',    label: 'Top 20 %',        group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
+  { key: 'make_cut', label: 'Make Cut %',      group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
+  // Course fit
+  { key: 'fit',      label: 'Course Fit',      group: 'Course Fit',  default: true,  fmt: v => v.toFixed(3) },
+  { key: 'history',  label: 'Course History',  group: 'Course Fit',  default: true,  fmt: v => v.toFixed(3) },
+  { key: 'approach', label: 'Approach Fit',    group: 'Course Fit',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'shortgame',label: 'Short Game Fit',  group: 'Course Fit',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'dna',      label: 'DNA Score',       group: 'Course Fit',  default: true,  fmt: v => v.toFixed(3), special: 'dna' },
+  // Model decomp
+  { key: 'final_pred',    label: 'Final Pred',         group: 'Model',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'baseline_pred', label: 'Baseline Pred',      group: 'Model',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'major_adj',     label: 'Major Adjustment',   group: 'Model',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'timing_adj',    label: 'Timing Adjustment',  group: 'Model',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'age_adj',       label: 'Age Adjustment',     group: 'Model',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'dd_adj',        label: 'Driving Dist Adj',   group: 'Model',  default: false, fmt: v => v.toFixed(3) },
+  { key: 'da_adj',        label: 'Driving Acc Adj',    group: 'Model',  default: false, fmt: v => v.toFixed(3) },
+  // Live SG stats
+  { key: 'sg_putt',  label: 'SG: Putting',     group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(3) : '—' },
+  { key: 'sg_arg',   label: 'SG: Around Green',group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(3) : '—' },
+  { key: 'sg_app',   label: 'SG: Approach',    group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(3) : '—' },
+  { key: 'sg_ott',   label: 'SG: Off the Tee', group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(3) : '—' },
+  { key: 'sg_t2g',   label: 'SG: Tee to Green',group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(3) : '—' },
+  { key: 'sg_total', label: 'SG: Total',        group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(3) : '—' },
+  { key: 'drv_dist', label: 'Driving Distance', group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(1) : '—' },
+  { key: 'drv_acc',  label: 'Driving Accuracy', group: 'Strokes Gained', default: false, fmt: v => v != null ? (v * 100).toFixed(1) + '%' : '—' },
+  // Player info
+  { key: 'age',      label: 'Age',             group: 'Player Info', default: false, fmt: v => v != null ? v : '—' },
+  { key: 'country',  label: 'Country',         group: 'Player Info', default: false, fmt: v => v || '—' },
+  // Status
+  { key: 'status',   label: 'Status',          group: 'Status',      default: true,  fmt: v => v, special: 'status', noSort: true },
 ];
 
+// ── STATE ────────────────────────────────────────────────────────
 let allPlayers = [];
+let usedPlayers = new Set(JSON.parse(localStorage.getItem('usedPlayers') || '[]'));
+let activeColumns = new Set(JSON.parse(localStorage.getItem('activeColumns') || 'null') || ALL_COLUMNS.filter(c => c.default).map(c => c.key));
+let currentSort = { col: 'win', dir: 'desc' };
 
-function isUsed(name) {
-  return USED.some(u => {
-    const uLast = u.split(" ").slice(-1)[0].toLowerCase();
-    const nLast = name.split(" ").slice(-1)[0].toLowerCase();
-    return uLast === nLast;
-  });
+// ── SAVE STATE ───────────────────────────────────────────────────
+function saveUsed() {
+  localStorage.setItem('usedPlayers', JSON.stringify([...usedPlayers]));
+  document.getElementById('mUsed').textContent = usedPlayers.size;
+}
+function saveCols() {
+  localStorage.setItem('activeColumns', JSON.stringify([...activeColumns]));
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function formatName(raw) {
+  if (!raw) return '';
+  if (raw.includes(',')) return raw.split(',').map(s => s.trim()).reverse().join(' ');
+  return raw;
+}
+function isUsed(name) { return usedPlayers.has(name); }
+function toggleUsed(name) {
+  if (usedPlayers.has(name)) usedPlayers.delete(name);
+  else usedPlayers.add(name);
+  saveUsed();
+  renderAll();
+}
+function clearAllUsed() {
+  if (!confirm('Clear all used players?')) return;
+  usedPlayers.clear();
+  saveUsed();
+  renderAll();
 }
 
 function americanOdds(pct) {
-  if (!pct || pct <= 0) return "N/A";
-  if (pct >= 50) return "-" + Math.round(pct / (100 - pct) * 100);
-  return "+" + Math.round((100 - pct) / pct * 100);
+  if (!pct || pct <= 0) return 'N/A';
+  if (pct >= 50) return '-' + Math.round(pct / (100 - pct) * 100);
+  return '+' + Math.round((100 - pct) / pct * 100);
 }
-
 function dnaScore(p) {
-  const fit = p.total_fit_adjustment || p.fit || 0;
-  const hist = p.course_history_adjustment || p.history || 0;
-  const app = p.cf_approach_comp || p.approach || 0;
-  const sg = p.cf_short_comp || p.shortgame || 0;
-  return (fit * 0.35) + (hist * 0.30) + (app * 0.20) + (sg * 0.15);
+  return (p.fit * 0.35) + (p.history * 0.30) + (p.approach * 0.20) + (p.shortgame * 0.15);
 }
-
 function dnaLabel(score) {
-  if (score >= 0.3) return { label: "Excellent", cls: "badge-green" };
-  if (score >= 0.1) return { label: "Good", cls: "badge-blue" };
-  if (score >= -0.1) return { label: "Neutral", cls: "badge-amber" };
-  return { label: "Poor fit", cls: "badge-red" };
+  if (score >= 0.3) return { label: 'Excellent', cls: 'badge-green' };
+  if (score >= 0.1) return { label: 'Good', cls: 'badge-blue' };
+  if (score >= -0.1) return { label: 'Neutral', cls: 'badge-amber' };
+  return { label: 'Poor fit', cls: 'badge-red' };
 }
-
 function recLabel(p) {
-  if (p.used) return { label: "Already used", cls: "rec-used" };
-  if (p.win >= 10 && p.dna >= 0.15) return { label: "Strong pick", cls: "rec-strong" };
-  if (p.win >= 5 && p.dna >= 0.1) return { label: "Good pick", cls: "rec-good" };
-  if (p.win >= 5 || p.dna >= 0.1) return { label: "Consider", cls: "rec-consider" };
-  return { label: "Monitor", cls: "rec-consider" };
+  if (p.used) return { label: 'Already used', cls: 'rec-used' };
+  if (p.win >= 10 && p.dna >= 0.15) return { label: 'Strong pick', cls: 'rec-strong' };
+  if (p.win >= 5 && p.dna >= 0.1) return { label: 'Good pick', cls: 'rec-good' };
+  if (p.win >= 5 || p.dna >= 0.1) return { label: 'Consider', cls: 'rec-consider' };
+  return { label: 'Monitor', cls: 'rec-consider' };
 }
 
+// ── TABS ─────────────────────────────────────────────────────────
 function showTab(tab) {
-  ["summary","field","betting","used"].forEach(t => {
-    document.getElementById("tab-" + t).style.display = t === tab ? "block" : "none";
+  ['summary','field','betting','used'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
-  document.querySelectorAll(".tab").forEach((el, i) => {
-    el.classList.toggle("active", ["summary","field","betting","used"][i] === tab);
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', ['summary','field','betting','used'][i] === tab);
   });
+  if (tab === 'used') renderUsedManager();
 }
 
+// ── LOAD DATA ────────────────────────────────────────────────────
 async function loadData() {
   try {
-    const res = await fetch("/api/predict");
-    if (!res.ok) throw new Error("API error " + res.status);
+    const res = await fetch('/api/predict');
+    if (!res.ok) throw new Error('API error ' + res.status);
     const data = await res.json();
 
-    document.getElementById("mEvent").textContent = data.event_name || "Current Tournament";
-    document.getElementById("mCourse").textContent = data.course_name || "—";
-    document.getElementById("eventName").textContent = data.event_name || "Current Tournament";
-    document.getElementById("lastUpdated").textContent = "Updated: " + (data.last_updated || "—");
+    document.getElementById('mEvent').textContent = data.event_name || 'Current Tournament';
+    document.getElementById('mCourse').textContent = data.course_name || '—';
+    document.getElementById('eventName').textContent = data.event_name || 'Current Tournament';
+    document.getElementById('lastUpdated').textContent = 'Updated: ' + (data.last_updated || '—');
+    document.getElementById('mUsed').textContent = usedPlayers.size;
 
     allPlayers = (data.players || []).map((p, i) => {
-      const dna = dnaScore(p);
-      // Convert "Last, First" to "First Last"
-      const rawName = p.player_name || '';
-      const name = rawName.includes(',')
-        ? rawName.split(',').map(s => s.trim()).reverse().join(' ')
-        : rawName;
+      const name = formatName(p.player_name);
+      const fit = p.total_fit_adjustment || 0;
+      const history = p.course_history_adjustment || 0;
+      const approach = p.cf_approach_comp || 0;
+      const shortgame = p.cf_short_comp || 0;
+      const dna = (fit * 0.35) + (history * 0.30) + (approach * 0.20) + (shortgame * 0.15);
       return {
-        name: name,
+        name,
+        dg_id: p.dg_id,
+        country: p.country || '',
+        age: p.age,
         rank: i + 1,
         win: (p.win || 0) * 100,
         top5: (p.top_5 || 0) * 100,
         top10: (p.top_10 || 0) * 100,
         top20: (p.top_20 || 0) * 100,
         make_cut: (p.make_cut || 0) * 100,
-        fit: p.total_fit_adjustment || 0,
-        history: p.course_history_adjustment || 0,
-        approach: p.cf_approach_comp || 0,
-        shortgame: p.cf_short_comp || 0,
-        dna: dna,
-        dk_odds: p.dk_odds || null,
+        fit, history, approach, shortgame, dna,
         final_pred: p.final_pred || 0,
+        baseline_pred: p.baseline_pred || 0,
+        major_adj: p.major_adjustment || 0,
+        timing_adj: p.timing_adjustment || 0,
+        age_adj: p.age_adjustment || 0,
+        dd_adj: p.driving_distance_adjustment || 0,
+        da_adj: p.driving_accuracy_adjustment || 0,
+        sg_putt: p.sg_putt,
+        sg_arg: p.sg_arg,
+        sg_app: p.sg_app,
+        sg_ott: p.sg_ott,
+        sg_t2g: p.sg_t2g,
+        sg_total: p.sg_total,
+        drv_dist: p.driving_distance,
+        drv_acc: p.driving_accuracy,
+        dk_odds: p.dk_odds,
         used: isUsed(name)
       };
     }).sort((a, b) => b.win - a.win).map((p, i) => ({ ...p, rank: i + 1 }));
 
-    document.getElementById("mField").textContent = allPlayers.length;
+    document.getElementById('mField').textContent = allPlayers.length;
     renderAll();
-    document.getElementById("loadingState").style.display = "none";
-    document.getElementById("mainContent").style.display = "block";
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
   } catch (e) {
-    document.getElementById("loadingState").style.display = "none";
-    document.getElementById("errorBox").textContent = "Could not load data: " + e.message;
-    document.getElementById("errorBox").style.display = "block";
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorBox').textContent = 'Could not load data: ' + e.message;
+    document.getElementById('errorBox').style.display = 'block';
   }
 }
 
+// ── RENDER ALL ───────────────────────────────────────────────────
 function renderAll() {
+  // Update used status
+  allPlayers.forEach(p => p.used = isUsed(p.name));
   renderTopPick();
   renderSummary();
   renderTable();
   renderBetting();
-  renderUsed();
+  if (document.getElementById('tab-used').style.display !== 'none') renderUsedManager();
 }
 
+// ── TOP PICK ─────────────────────────────────────────────────────
 function renderTopPick() {
   const avail = allPlayers.filter(p => !p.used);
   const scored = [...avail].sort((a, b) => (b.win + b.dna * 10) - (a.win + a.dna * 10));
   const top = scored[0];
   if (!top) return;
   const dna = dnaLabel(top.dna);
-  document.getElementById("topPickName").textContent = top.name;
-  document.getElementById("topPickDetail").textContent =
-    `Win: ${top.win.toFixed(1)}% · Top 10: ${top.top10.toFixed(1)}% · DNA Score: ${top.dna.toFixed(3)}`;
-  document.getElementById("topPickBadge").textContent = dna.label + " course fit";
+  document.getElementById('topPickName').textContent = top.name;
+  document.getElementById('topPickDetail').textContent =
+    `Win: ${top.win.toFixed(1)}% · Top 10: ${top.top10.toFixed(1)}% · DNA: ${top.dna.toFixed(3)}`;
+  document.getElementById('topPickBadge').textContent = dna.label + ' course fit';
 }
 
+// ── SUMMARY ──────────────────────────────────────────────────────
 function renderSummary() {
   const avail = allPlayers.filter(p => !p.used);
   const scored = [...avail].sort((a, b) => (b.win + b.dna * 10) - (a.win + a.dna * 10)).slice(0, 10);
-  const colors = ["gold", "silver", "bronze", "", "", "", "", "", "", ""];
-  document.getElementById("summaryList").innerHTML = scored.map((p, i) => {
+  const colors = ['gold','silver','bronze','','','','','','',''];
+  document.getElementById('summaryList').innerHTML = scored.map((p, i) => {
     const rec = recLabel(p);
     const dna = dnaLabel(p.dna);
     return `<div class="summary-rank">
@@ -349,111 +442,161 @@ function renderSummary() {
         <div class="rank-name">${p.name} <span class="badge ${dna.cls}">${dna.label} fit</span></div>
         <div class="rank-stats">Win: ${p.win.toFixed(1)}% · Top 10: ${p.top10.toFixed(1)}% · Make Cut: ${p.make_cut.toFixed(1)}% · DNA: ${p.dna.toFixed(3)}</div>
       </div>
-      <div class="rank-rec ${rec.cls}">${rec.label}</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="rank-rec ${rec.cls}">${rec.label}</div>
+        <button onclick="toggleUsed('${p.name}')" style="font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid #ccc;background:white;cursor:pointer;color:#c62828;">Mark used</button>
+      </div>
     </div>`;
-  }).join("");
+  }).join('');
 }
 
-let currentSort = { col: "win", dir: "desc" };
-
+// ── TABLE ────────────────────────────────────────────────────────
 function sortTable(col) {
-  if (currentSort.col === col) {
-    currentSort.dir = currentSort.dir === "desc" ? "asc" : "desc";
-  } else {
-    currentSort.col = col;
-    currentSort.dir = col === "name" ? "asc" : "desc";
-  }
-  // Update sort indicators
-  const cols = ["rank","name","win","top5","top10","top20","make_cut","fit","history","dna"];
-  cols.forEach(c => {
-    const el = document.getElementById("sort-" + c);
-    if (el) el.innerHTML = "";
-  });
-  const activeEl = document.getElementById("sort-" + col);
-  if (activeEl) activeEl.innerHTML = currentSort.dir === "desc" ? "&#9660;" : "&#9650;";
-  // Also sync the dropdown
-  const sortMap = { win:"win", top10:"top10", dna:"dna", make_cut:"make_cut" };
-  if (sortMap[col]) document.getElementById("fSort").value = sortMap[col];
+  if (currentSort.col === col) currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+  else { currentSort.col = col; currentSort.dir = col === 'name' || col === 'country' ? 'asc' : 'desc'; }
   renderTable();
 }
 
 function renderTable() {
-  const filter = document.getElementById("fFilter").value;
-  const sort = document.getElementById("fSort").value;
+  const filter = document.getElementById('fFilter').value;
   let list = [...allPlayers];
-  if (filter === "avail") list = list.filter(p => !p.used);
-  if (filter === "top25") list = list.filter(p => p.rank <= 25);
+  if (filter === 'avail') list = list.filter(p => !p.used);
+  if (filter === 'top25') list = list.filter(p => p.rank <= 25);
 
-  // Use header click sort if active, otherwise use dropdown
   const col = currentSort.col;
   const dir = currentSort.dir;
   list.sort((a, b) => {
-    let aVal, bVal;
-    if (col === "name") { aVal = a.name; bVal = b.name; return dir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal); }
-    if (col === "rank") { aVal = a.rank; bVal = b.rank; }
-    else if (col === "win") { aVal = a.win; bVal = b.win; }
-    else if (col === "top5") { aVal = a.top5; bVal = b.top5; }
-    else if (col === "top10") { aVal = a.top10; bVal = b.top10; }
-    else if (col === "top20") { aVal = a.top20; bVal = b.top20; }
-    else if (col === "make_cut") { aVal = a.make_cut; bVal = b.make_cut; }
-    else if (col === "fit") { aVal = a.fit; bVal = b.fit; }
-    else if (col === "history") { aVal = a.history; bVal = b.history; }
-    else if (col === "dna") { aVal = a.dna; bVal = b.dna; }
-    else { aVal = a.win; bVal = b.win; }
-    return dir === "asc" ? aVal - bVal : bVal - aVal;
+    let aVal = a[col], bVal = b[col];
+    if (col === 'name' || col === 'country') {
+      aVal = aVal || ''; bVal = bVal || '';
+      return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    }
+    aVal = aVal || 0; bVal = bVal || 0;
+    return dir === 'asc' ? aVal - bVal : bVal - aVal;
   });
 
+  const cols = ALL_COLUMNS.filter(c => activeColumns.has(c.key));
   const dnaMax = Math.max(...list.map(p => Math.abs(p.dna)), 0.01);
 
-  document.getElementById("tableBody").innerHTML = list.map((p, i) => {
-    const dna = dnaLabel(p.dna);
-    const dnaPct = Math.min(Math.abs(p.dna) / dnaMax * 100, 100).toFixed(0);
-    const rowCls = p.used ? "used" : i < 5 ? "top5" : "";
-    return `<tr class="${rowCls}">
-      <td style="font-weight:600;color:#888;">${p.rank}</td>
-      <td style="font-weight:${p.used ? 400 : 600};">${p.name}</td>
-      <td>${p.win.toFixed(1)}%</td>
-      <td>${p.top5.toFixed(1)}%</td>
-      <td>${p.top10.toFixed(1)}%</td>
-      <td>${p.top20.toFixed(1)}%</td>
-      <td>${p.make_cut.toFixed(1)}%</td>
-      <td>${p.fit.toFixed(3)}</td>
-      <td>${p.history.toFixed(3)}</td>
-      <td>
-        <div class="dna-bar"><div class="dna-fill" style="width:${dnaPct}%"></div></div>
-        <span style="font-size:11px;margin-left:6px;">${p.dna.toFixed(3)}</span>
-        <span class="badge ${dna.cls}">${dna.label}</span>
-      </td>
-      <td style="font-size:11px;font-weight:600;color:${p.used ? '#c62828' : '#2e7d32'};">${p.used ? "Used" : "Available"}</td>
-    </tr>`;
-  }).join("");
+  // Render header
+  document.getElementById('tableHead').innerHTML = '<tr>' + cols.map(c => {
+    const isActive = currentSort.col === c.key;
+    const arrow = isActive ? (currentSort.dir === 'desc' ? ' &#9660;' : ' &#9650;') : '';
+    const noSort = c.noSort ? 'class="no-sort"' : `onclick="sortTable('${c.key}')"`;
+    return `<th ${noSort}>${c.label}<span class="sort-arrow">${arrow}</span></th>`;
+  }).join('') + '</tr>';
+
+  // Render rows
+  document.getElementById('tableBody').innerHTML = list.map((p, i) => {
+    const rowCls = p.used ? 'used' : i < 5 ? 'top5' : '';
+    const cells = cols.map(c => {
+      if (c.special === 'dna') {
+        const dna = dnaLabel(p.dna);
+        const dnaPct = Math.min(Math.abs(p.dna) / dnaMax * 100, 100).toFixed(0);
+        return `<td><div class="dna-bar"><div class="dna-fill" style="width:${dnaPct}%"></div></div> <span style="font-size:11px;">${p.dna.toFixed(3)}</span> <span class="badge ${dna.cls}">${dna.label}</span></td>`;
+      }
+      if (c.special === 'status') {
+        return `<td style="white-space:nowrap;">
+          <span style="font-size:11px;font-weight:600;color:${p.used ? '#c62828' : '#2e7d32'};">${p.used ? 'Used' : 'Available'}</span>
+          <button onclick="toggleUsed('${p.name}')" style="margin-left:6px;font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid #ddd;background:white;cursor:pointer;color:${p.used ? '#2e7d32' : '#c62828'};">${p.used ? 'Unmark' : 'Mark used'}</button>
+        </td>`;
+      }
+      if (c.key === 'name') return `<td style="font-weight:${p.used ? 400 : 600};">${p.name}</td>`;
+      const val = p[c.key];
+      return `<td>${val != null ? c.fmt(val) : '—'}</td>`;
+    }).join('');
+    return `<tr class="${rowCls}">${cells}</tr>`;
+  }).join('');
 }
 
+// ── BETTING ──────────────────────────────────────────────────────
 function renderBetting() {
-  const top = allPlayers.filter(p => p.win > 1).slice(0, 8);
-  document.getElementById("betsList").innerHTML = top.map(p => {
+  const top = allPlayers.filter(p => p.win > 0.5).slice(0, 10);
+  document.getElementById('betsList').innerHTML = top.map(p => {
     const modelOdds = americanOdds(p.win);
-    const edge = p.win - (p.dk_odds ? (100 / (Math.abs(p.dk_odds) + 100) * 100) : p.win);
-    const evLabel = edge > 1 ? "+EV" : "Fair";
+    const bookImplied = p.dk_odds ? (p.dk_odds > 0 ? 100 / (p.dk_odds + 100) * 100 : Math.abs(p.dk_odds) / (Math.abs(p.dk_odds) + 100) * 100) : null;
+    const edge = bookImplied ? p.win - bookImplied : 0;
+    const evLabel = edge > 1 ? '+EV' : 'Fair';
+    const evColor = edge > 1 ? '#2e7d32' : '#888';
     return `<div class="bet-row">
       <div>
         <div style="font-size:13px;font-weight:600;">${p.name}</div>
-        <div style="font-size:11px;color:#888;">Model: ${p.win.toFixed(1)}% · ${evLabel}</div>
+        <div style="font-size:11px;color:#888;">Model: ${p.win.toFixed(1)}% · Book: ${bookImplied ? bookImplied.toFixed(1) + '%' : 'N/A'} · <span style="color:${evColor};font-weight:600;">${evLabel}</span></div>
       </div>
-      <div class="odds ${modelOdds.startsWith('+') ? 'plus' : 'minus'}">${modelOdds}</div>
+      <div class="odds ${modelOdds.startsWith('+') ? 'plus' : 'minus'}">${p.dk_odds ? (p.dk_odds > 0 ? '+' + p.dk_odds : p.dk_odds) : modelOdds}</div>
     </div>`;
-  }).join("");
+  }).join('');
 
-  document.getElementById("matchupsList").innerHTML = `
-    <div style="font-size:13px;color:#888;padding:1rem 0;text-align:center;">
-      Matchup odds available with betting tools endpoint upgrade.
-    </div>`;
+  const evPlayers = allPlayers.filter(p => p.dk_odds && p.win > 0.5).map(p => {
+    const bookImplied = p.dk_odds > 0 ? 100 / (p.dk_odds + 100) * 100 : Math.abs(p.dk_odds) / (Math.abs(p.dk_odds) + 100) * 100;
+    return { ...p, edge: p.win - bookImplied };
+  }).filter(p => p.edge > 0).sort((a, b) => b.edge - a.edge).slice(0, 8);
+
+  document.getElementById('evList').innerHTML = evPlayers.length ? evPlayers.map(p => `
+    <div class="bet-row">
+      <div>
+        <div style="font-size:13px;font-weight:600;">${p.name}</div>
+        <div style="font-size:11px;color:#888;">Edge: +${p.edge.toFixed(1)}% · Win: ${p.win.toFixed(1)}%</div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#2e7d32;">+EV</div>
+    </div>`).join('') : '<div style="font-size:13px;color:#888;padding:1rem 0;text-align:center;">No positive EV bets found this week.</div>';
 }
 
-function renderUsed() {
-  document.getElementById("usedGrid").innerHTML = USED.map(p =>
-    `<div class="used-chip"><strong>${p}</strong>Used this season</div>`
-  ).join("");
+// ── USED MANAGER ─────────────────────────────────────────────────
+function renderUsedManager() {
+  document.getElementById('usedCount').textContent = usedPlayers.size;
+  document.getElementById('usedChips').innerHTML = [...usedPlayers].map(name =>
+    `<div class="used-chip">${name} <button onclick="toggleUsed('${name}')" title="Remove">&#10005;</button></div>`
+  ).join('') || '<span style="font-size:12px;color:#aaa;">No players used yet</span>';
+
+  const search = (document.getElementById('usedSearch').value || '').toLowerCase();
+  const filtered = allPlayers.filter(p => !search || p.name.toLowerCase().includes(search));
+
+  document.getElementById('usedManagerList').innerHTML = filtered.map(p => `
+    <div class="used-player-item ${p.used ? 'is-used' : ''}">
+      <span style="font-weight:${p.used ? 600 : 400};color:${p.used ? '#c62828' : '#1a1a1a'};">${p.name}</span>
+      <button class="${p.used ? 'btn-unmark' : 'btn-mark-used'}" onclick="toggleUsed('${p.name}')">
+        ${p.used ? 'Unmark' : 'Mark used'}
+      </button>
+    </div>`).join('');
+}
+
+// ── COLUMN PICKER ────────────────────────────────────────────────
+function openColumnPicker() {
+  const groups = {};
+  ALL_COLUMNS.forEach(c => {
+    if (!groups[c.group]) groups[c.group] = [];
+    groups[c.group].push(c);
+  });
+  document.getElementById('colPickerGroups').innerHTML = Object.entries(groups).map(([group, cols]) => `
+    <div class="col-group">
+      <div class="col-group-title">${group}</div>
+      <div class="col-grid">
+        ${cols.map(c => `
+          <label class="col-item">
+            <input type="checkbox" ${activeColumns.has(c.key) ? 'checked' : ''} onchange="toggleCol('${c.key}', this.checked)">
+            ${c.label}
+          </label>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('colModal').style.display = 'flex';
+}
+function toggleCol(key, checked) {
+  if (checked) activeColumns.add(key);
+  else activeColumns.delete(key);
+  saveCols();
+  renderTable();
+}
+function closeColModal(e) {
+  if (!e || e.target === document.getElementById('colModal')) {
+    document.getElementById('colModal').style.display = 'none';
+  }
+}
+function resetColumns() {
+  activeColumns = new Set(ALL_COLUMNS.filter(c => c.default).map(c => c.key));
+  saveCols();
+  openColumnPicker();
+  renderTable();
 }
 
 loadData();
