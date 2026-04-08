@@ -21,13 +21,23 @@ export default async function handler(req, res) {
     const decomp = await decompRes.json();
     const betting = await bettingRes.json();
 
-    // Normalize name to "last, first" format for matching
+    // DEBUG: show raw preds structure
+    const debugInfo = {
+      preds_top_keys: Object.keys(preds),
+      preds_data_type: typeof preds.data,
+      preds_data_is_array: Array.isArray(preds.data),
+      preds_data_length: Array.isArray(preds.data) ? preds.data.length : 'not array',
+      preds_data_keys: preds.data && typeof preds.data === 'object' && !Array.isArray(preds.data) ? Object.keys(preds.data) : 'n/a',
+      preds_first_item: Array.isArray(preds.data) && preds.data[0] ? Object.keys(preds.data[0]) : 'no items',
+      decomp_player_count: (decomp.players || []).length,
+      sample_decomp_player: decomp.players && decomp.players[0] ? decomp.players[0].player_name : 'none'
+    };
+
+    // Normalize name to lastname, firstname
     function normalizeName(name) {
       if (!name) return '';
       name = name.trim();
-      // Already in "Last, First" format
       if (name.includes(',')) return name.toLowerCase();
-      // Convert "First Last" to "last, first"
       const parts = name.split(' ');
       if (parts.length >= 2) {
         const last = parts[parts.length - 1];
@@ -37,80 +47,92 @@ export default async function handler(req, res) {
       return name.toLowerCase();
     }
 
-    // Build predsMap using dg_id as primary key, name as fallback
-    const predsMapById = {};
+    // Build predsMap - try every possible data location
     const predsMapByName = {};
+    const predsMapById = {};
 
-    const rawData = preds.data;
-    let predsArray = [];
-
-    if (Array.isArray(rawData)) {
-      predsArray = rawData;
-    } else if (rawData && typeof rawData === 'object') {
-      // Try baseline key first
-      const nested = rawData.baseline || rawData.baseline_history_fit;
-      if (Array.isArray(nested)) {
-        predsArray = nested;
-      } else {
-        Object.values(rawData).forEach(arr => {
-          if (Array.isArray(arr) && arr.length > predsArray.length) {
-            predsArray = arr;
-          }
-        });
-      }
+    // Try preds.data as array
+    if (Array.isArray(preds.data)) {
+      preds.data.forEach(entry => {
+        if (!entry) return;
+        if (entry.dg_id) predsMapById[entry.dg_id] = entry;
+        if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
+      });
     }
 
-    predsArray.forEach(entry => {
-      if (!entry) return;
-      if (entry.dg_id) predsMapById[entry.dg_id] = entry;
-      if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
+    // Try preds.data.baseline
+    if (preds.data && preds.data.baseline && Array.isArray(preds.data.baseline)) {
+      preds.data.baseline.forEach(entry => {
+        if (!entry) return;
+        if (entry.dg_id) predsMapById[entry.dg_id] = entry;
+        if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
+      });
+    }
+
+    // Try preds directly as array
+    if (Array.isArray(preds)) {
+      preds.forEach(entry => {
+        if (!entry) return;
+        if (entry.dg_id) predsMapById[entry.dg_id] = entry;
+        if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
+      });
+    }
+
+    // Try any array inside preds
+    Object.values(preds).forEach(val => {
+      if (Array.isArray(val) && val.length > 0 && val[0] && val[0].player_name) {
+        val.forEach(entry => {
+          if (entry.dg_id) predsMapById[entry.dg_id] = entry;
+          if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
+        });
+      }
     });
 
-    // Build betting map
-    const bettingMap = {};
+    debugInfo.preds_map_size_by_id = Object.keys(predsMapById).length;
+    debugInfo.preds_map_size_by_name = Object.keys(predsMapByName).length;
+    debugInfo.sample_pred_keys = Object.keys(predsMapByName).slice(0, 3);
+
+    // Build betting map by dg_id
+    const bettingMapById = {};
     (betting.odds || []).forEach(p => {
-      if (!p) return;
-      if (p.dg_id) bettingMap[p.dg_id] = p;
-      if (p.player_name) bettingMap[normalizeName(p.player_name)] = p;
+      if (p && p.dg_id) bettingMapById[p.dg_id] = p;
     });
 
-    // Use decomp players as primary list
+    // Build players from decomp
     const players = (decomp.players || []).map(p => {
-      // Try matching by dg_id first, then normalized name
       const pred = predsMapById[p.dg_id] || predsMapByName[normalizeName(p.player_name)] || {};
-      const bet = bettingMap[p.dg_id] || bettingMap[normalizeName(p.player_name)] || {};
-
-      // Parse American odds string to number
+      const bet = bettingMapById[p.dg_id] || {};
       const dkOdds = bet.draftkings ? parseInt(bet.draftkings.replace('+', '')) : null;
 
       return {
         player_name: p.player_name,
         dg_id: p.dg_id,
-        win: pred.win || 0,
-        top_5: pred.top_5 || 0,
-        top_10: pred.top_10 || 0,
-        top_20: pred.top_20 || 0,
-        make_cut: pred.make_cut || 0,
+        win: (pred.win || 0) * 100,
+        top_5: (pred.top_5 || 0) * 100,
+        top_10: (pred.top_10 || 0) * 100,
+        top_20: (pred.top_20 || 0) * 100,
+        make_cut: (pred.make_cut || 0) * 100,
         total_fit_adjustment: p.total_fit_adjustment || 0,
         course_history_adjustment: p.course_history_adjustment || 0,
         cf_approach_comp: p.cf_approach_comp || 0,
         cf_short_comp: p.cf_short_comp || 0,
         final_pred: p.final_pred || 0,
-        dk_odds: dkOdds
+        dk_odds: dkOdds,
+        pred_found: Object.keys(pred).length > 0
       };
     });
 
-    // Sort by final_pred descending
     players.sort((a, b) => b.final_pred - a.final_pred);
 
     res.status(200).json({
       event_name: preds.event_name || decomp.event_name,
       last_updated: preds.last_updated || decomp.last_updated,
       course_name: decomp.course_name || '',
-      players: players
+      players: players,
+      debug: debugInfo
     });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message, stack: error.stack });
   }
 }
