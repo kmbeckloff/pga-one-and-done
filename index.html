@@ -596,8 +596,8 @@ async function loadData() {
       return {
         name, dg_id: p.dg_id, country: p.country||'', age: p.age,
         owgr: p.owgr, rank: i+1,
-        win: p.win*100, top5: p.top_5*100, top10: p.top_10*100,
-        top20: p.top_20*100, make_cut: p.make_cut*100,
+        win: p.win, top5: p.top_5, top10: p.top_10,
+        top20: p.top_20, make_cut: p.make_cut,
         fit: p.total_fit_adjustment||0, history: p.course_history_adjustment||0,
         approach: p.cf_approach_comp||0, shortgame: p.cf_short_comp||0,
         dna: p.dna||0, final_pred: p.final_pred||0,
