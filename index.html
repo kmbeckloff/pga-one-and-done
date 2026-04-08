@@ -238,6 +238,7 @@ const ALL_COLUMNS = [
   // Predictions
   { key: 'rank',     label: 'Rank',            group: 'Predictions', default: true,  fmt: v => v },
   { key: 'name',     label: 'Player',          group: 'Predictions', default: true,  fmt: v => v, noSort: false },
+  { key: 'owgr',     label: 'OWGR',            group: 'Predictions', default: true,  fmt: v => v ? '#' + v : '—' },
   { key: 'win',      label: 'Win %',           group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
   { key: 'top5',     label: 'Top 5 %',         group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
   { key: 'top10',    label: 'Top 10 %',        group: 'Predictions', default: true,  fmt: v => v.toFixed(1) + '%' },
@@ -267,6 +268,7 @@ const ALL_COLUMNS = [
   { key: 'drv_dist', label: 'Driving Distance', group: 'Strokes Gained', default: false, fmt: v => v != null ? v.toFixed(1) : '—' },
   { key: 'drv_acc',  label: 'Driving Accuracy', group: 'Strokes Gained', default: false, fmt: v => v != null ? (v * 100).toFixed(1) + '%' : '—' },
   // Player info
+  { key: 'owgr',     label: 'OWGR',            group: 'Player Info', default: false, fmt: v => v ? '#' + v : '—' },
   { key: 'age',      label: 'Age',             group: 'Player Info', default: false, fmt: v => v != null ? v : '—' },
   { key: 'country',  label: 'Country',         group: 'Player Info', default: false, fmt: v => v || '—' },
   // Status
@@ -367,6 +369,7 @@ async function loadData() {
         country: p.country || '',
         age: p.age,
         rank: i + 1,
+        owgr: p.owgr || null,
         win: (p.win || 0) * 100,
         top5: (p.top_5 || 0) * 100,
         top10: (p.top_10 || 0) * 100,
