@@ -24,21 +24,39 @@ export default async function handler(req, res) {
     const decomp = await decompRes.json();
     const betting = await bettingRes.json();
 
-    const players = [];
-    if (preds.data) {
+    // Build a map from preds using baseline model
+    const predsMap = {};
+    if (preds.data && Array.isArray(preds.data)) {
       preds.data.forEach(entry => {
         if (entry.player_name) {
-          players.push(entry);
+          predsMap[entry.player_name] = entry;
         }
       });
     }
 
+    // Use decomp players as primary list — it has the full field
+    const players = (decomp.players || []).map(p => {
+      const pred = predsMap[p.player_name] || {};
+      return {
+        player_name: p.player_name,
+        win: pred.win || 0,
+        top_5: pred.top_5 || 0,
+        top_10: pred.top_10 || 0,
+        top_20: pred.top_20 || 0,
+        make_cut: pred.make_cut || 0,
+        total_fit_adjustment: p.total_fit_adjustment || 0,
+        course_history_adjustment: p.course_history_adjustment || 0,
+        cf_approach_comp: p.cf_approach_comp || 0,
+        cf_short_comp: p.cf_short_comp || 0,
+        final_pred: p.final_pred || 0
+      };
+    });
+
     res.status(200).json({
-      event_name: preds.event_name,
-      last_updated: preds.last_updated,
+      event_name: preds.event_name || decomp.event_name,
+      last_updated: preds.last_updated || decomp.last_updated,
+      course_name: decomp.course_name || '',
       players: players,
-      decomp_players: decomp.players || [],
-      course_name: decomp.course_name || "",
       betting_odds: betting.odds || []
     });
 
