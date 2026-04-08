@@ -235,10 +235,10 @@ function americanOdds(pct) {
 }
 
 function dnaScore(p) {
-  const fit = p.total_fit_adjustment || 0;
-  const hist = p.course_history_adjustment || 0;
-  const app = p.cf_approach_comp || 0;
-  const sg = p.cf_short_comp || 0;
+  const fit = p.total_fit_adjustment || p.fit || 0;
+  const hist = p.course_history_adjustment || p.history || 0;
+  const app = p.cf_approach_comp || p.approach || 0;
+  const sg = p.cf_short_comp || p.shortgame || 0;
   return (fit * 0.35) + (hist * 0.30) + (app * 0.20) + (sg * 0.15);
 }
 
@@ -279,14 +279,19 @@ async function loadData() {
 
     allPlayers = (data.players || []).map((p, i) => {
       const dna = dnaScore(p);
+      // Convert "Last, First" to "First Last"
+      const rawName = p.player_name || '';
+      const name = rawName.includes(',')
+        ? rawName.split(',').map(s => s.trim()).reverse().join(' ')
+        : rawName;
       return {
-        name: p.player_name,
+        name: name,
         rank: i + 1,
-        win: (p.win || 0) * 100,
-        top5: (p.top_5 || 0) * 100,
-        top10: (p.top_10 || 0) * 100,
-        top20: (p.top_20 || 0) * 100,
-        make_cut: (p.make_cut || 0) * 100,
+        win: p.win || 0,
+        top5: p.top_5 || 0,
+        top10: p.top_10 || 0,
+        top20: p.top_20 || 0,
+        make_cut: p.make_cut || 0,
         fit: p.total_fit_adjustment || 0,
         history: p.course_history_adjustment || 0,
         approach: p.cf_approach_comp || 0,
@@ -294,9 +299,9 @@ async function loadData() {
         dna: dna,
         dk_odds: p.dk_odds || null,
         final_pred: p.final_pred || 0,
-        used: isUsed(p.player_name)
+        used: isUsed(name)
       };
-    }).sort((a, b) => b.final_pred - a.final_pred).map((p, i) => ({ ...p, rank: i + 1 }));
+    }).sort((a, b) => b.win - a.win).map((p, i) => ({ ...p, rank: i + 1 }));
 
     document.getElementById("mField").textContent = allPlayers.length;
     renderAll();
