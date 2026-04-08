@@ -21,76 +21,16 @@ export default async function handler(req, res) {
     const decomp = await decompRes.json();
     const betting = await bettingRes.json();
 
-    // DEBUG: show raw preds structure
-    const debugInfo = {
-      preds_top_keys: Object.keys(preds),
-      preds_data_type: typeof preds.data,
-      preds_data_is_array: Array.isArray(preds.data),
-      preds_data_length: Array.isArray(preds.data) ? preds.data.length : 'not array',
-      preds_data_keys: preds.data && typeof preds.data === 'object' && !Array.isArray(preds.data) ? Object.keys(preds.data) : 'n/a',
-      preds_first_item: Array.isArray(preds.data) && preds.data[0] ? Object.keys(preds.data[0]) : 'no items',
-      decomp_player_count: (decomp.players || []).length,
-      sample_decomp_player: decomp.players && decomp.players[0] ? decomp.players[0].player_name : 'none'
-    };
+    // Data is in preds.baseline (not preds.data)
+    const predsArray = preds.baseline || [];
 
-    // Normalize name to lastname, firstname
-    function normalizeName(name) {
-      if (!name) return '';
-      name = name.trim();
-      if (name.includes(',')) return name.toLowerCase();
-      const parts = name.split(' ');
-      if (parts.length >= 2) {
-        const last = parts[parts.length - 1];
-        const first = parts.slice(0, parts.length - 1).join(' ');
-        return `${last}, ${first}`.toLowerCase();
-      }
-      return name.toLowerCase();
-    }
-
-    // Build predsMap - try every possible data location
-    const predsMapByName = {};
     const predsMapById = {};
-
-    // Try preds.data as array
-    if (Array.isArray(preds.data)) {
-      preds.data.forEach(entry => {
-        if (!entry) return;
-        if (entry.dg_id) predsMapById[entry.dg_id] = entry;
-        if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
-      });
-    }
-
-    // Try preds.data.baseline
-    if (preds.data && preds.data.baseline && Array.isArray(preds.data.baseline)) {
-      preds.data.baseline.forEach(entry => {
-        if (!entry) return;
-        if (entry.dg_id) predsMapById[entry.dg_id] = entry;
-        if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
-      });
-    }
-
-    // Try preds directly as array
-    if (Array.isArray(preds)) {
-      preds.forEach(entry => {
-        if (!entry) return;
-        if (entry.dg_id) predsMapById[entry.dg_id] = entry;
-        if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
-      });
-    }
-
-    // Try any array inside preds
-    Object.values(preds).forEach(val => {
-      if (Array.isArray(val) && val.length > 0 && val[0] && val[0].player_name) {
-        val.forEach(entry => {
-          if (entry.dg_id) predsMapById[entry.dg_id] = entry;
-          if (entry.player_name) predsMapByName[normalizeName(entry.player_name)] = entry;
-        });
-      }
+    const predsMapByName = {};
+    predsArray.forEach(entry => {
+      if (!entry) return;
+      if (entry.dg_id) predsMapById[entry.dg_id] = entry;
+      if (entry.player_name) predsMapByName[entry.player_name.toLowerCase()] = entry;
     });
-
-    debugInfo.preds_map_size_by_id = Object.keys(predsMapById).length;
-    debugInfo.preds_map_size_by_name = Object.keys(predsMapByName).length;
-    debugInfo.sample_pred_keys = Object.keys(predsMapByName).slice(0, 3);
 
     // Build betting map by dg_id
     const bettingMapById = {};
@@ -98,9 +38,9 @@ export default async function handler(req, res) {
       if (p && p.dg_id) bettingMapById[p.dg_id] = p;
     });
 
-    // Build players from decomp
+    // Build players from decomp using dg_id to match predictions
     const players = (decomp.players || []).map(p => {
-      const pred = predsMapById[p.dg_id] || predsMapByName[normalizeName(p.player_name)] || {};
+      const pred = predsMapById[p.dg_id] || predsMapByName[p.player_name.toLowerCase()] || {};
       const bet = bettingMapById[p.dg_id] || {};
       const dkOdds = bet.draftkings ? parseInt(bet.draftkings.replace('+', '')) : null;
 
@@ -117,22 +57,21 @@ export default async function handler(req, res) {
         cf_approach_comp: p.cf_approach_comp || 0,
         cf_short_comp: p.cf_short_comp || 0,
         final_pred: p.final_pred || 0,
-        dk_odds: dkOdds,
-        pred_found: Object.keys(pred).length > 0
+        dk_odds: dkOdds
       };
     });
 
-    players.sort((a, b) => b.final_pred - a.final_pred);
+    // Sort by win probability descending
+    players.sort((a, b) => b.win - a.win);
 
     res.status(200).json({
-      event_name: preds.event_name || decomp.event_name,
-      last_updated: preds.last_updated || decomp.last_updated,
+      event_name: preds.event_name,
+      last_updated: preds.last_updated,
       course_name: decomp.course_name || '',
-      players: players,
-      debug: debugInfo
+      players: players
     });
 
   } catch (error) {
-    res.status(500).json({ error: error.message, stack: error.stack });
+    res.status(500).json({ error: error.message });
   }
 }
