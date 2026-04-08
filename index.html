@@ -270,33 +270,15 @@ async function loadData() {
   try {
     const res = await fetch("/api/predict");
     if (!res.ok) throw new Error("API error " + res.status);
-    const { preds, decomp, betting } = await res.json();
+    const data = await res.json();
 
-    const eventName = preds.event_name || "Current Tournament";
-    const courseName = decomp.course_name || "";
-    document.getElementById("mEvent").textContent = eventName;
-    document.getElementById("mCourse").textContent = courseName;
-    document.getElementById("eventName").textContent = eventName;
-    document.getElementById("lastUpdated").textContent = "Updated: " + (preds.last_updated || "—");
+    document.getElementById("mEvent").textContent = data.event_name || "Current Tournament";
+    document.getElementById("mCourse").textContent = data.course_name || "—";
+    document.getElementById("eventName").textContent = data.event_name || "Current Tournament";
+    document.getElementById("lastUpdated").textContent = "Updated: " + (data.last_updated || "—");
 
-    const decompMap = {};
-    (decomp.players || []).forEach(p => {
-      if (p && p.player_name) decompMap[p.player_name] = p;
-    });
-
-    const bettingMap = {};
-    const bettingArr = betting.odds || betting.data || (Array.isArray(betting) ? betting : []);
-    bettingArr.forEach(p => {
-      if (p && p.player_name) bettingMap[p.player_name] = p;
-    });
-
-    const predsData = preds.data || [];
-    const baseline = predsData.filter(p => p && p.player_name);
-
-    allPlayers = baseline.map((p, i) => {
-      const d = decompMap[p.player_name] || {};
-      const b = bettingMap[p.player_name] || {};
-      const dna = dnaScore(d);
+    allPlayers = (data.players || []).map((p, i) => {
+      const dna = dnaScore(p);
       return {
         name: p.player_name,
         rank: i + 1,
@@ -305,15 +287,16 @@ async function loadData() {
         top10: (p.top_10 || 0) * 100,
         top20: (p.top_20 || 0) * 100,
         make_cut: (p.make_cut || 0) * 100,
-        fit: d.total_fit_adjustment || 0,
-        history: d.course_history_adjustment || 0,
-        approach: d.cf_approach_comp || 0,
-        shortgame: d.cf_short_comp || 0,
+        fit: p.total_fit_adjustment || 0,
+        history: p.course_history_adjustment || 0,
+        approach: p.cf_approach_comp || 0,
+        shortgame: p.cf_short_comp || 0,
         dna: dna,
-        dk_odds: b.draftkings || null,
+        dk_odds: p.dk_odds || null,
+        final_pred: p.final_pred || 0,
         used: isUsed(p.player_name)
       };
-    }).sort((a, b) => b.win - a.win).map((p, i) => ({ ...p, rank: i + 1 }));
+    }).sort((a, b) => b.final_pred - a.final_pred).map((p, i) => ({ ...p, rank: i + 1 }));
 
     document.getElementById("mField").textContent = allPlayers.length;
     renderAll();
