@@ -42,6 +42,8 @@
     .filter-row select { font-size: 12px; padding: 5px 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { text-align: left; font-size: 11px; color: #888; font-weight: 600; padding: 6px 10px; border-bottom: 2px solid #f0f0f0; white-space: nowrap; }
+    th:hover { color: #1a3a2a; background: #f5f5f5; }
+    th span { font-size: 9px; margin-left: 2px; color: #1a3a2a; }
     td { padding: 8px 10px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
     tr:hover td { background: #fafafa; }
     tr.used td { opacity: 0.4; }
@@ -165,16 +167,16 @@
           <table>
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Player</th>
-                <th>Win %</th>
-                <th>Top 5 %</th>
-                <th>Top 10 %</th>
-                <th>Top 20 %</th>
-                <th>Make Cut %</th>
-                <th>Course Fit</th>
-                <th>Course History</th>
-                <th>DNA Score</th>
+                <th onclick="sortTable('rank')" style="cursor:pointer;user-select:none;">Rank <span id="sort-rank"></span></th>
+                <th onclick="sortTable('name')" style="cursor:pointer;user-select:none;">Player <span id="sort-name"></span></th>
+                <th onclick="sortTable('win')" style="cursor:pointer;user-select:none;">Win % <span id="sort-win">&#9660;</span></th>
+                <th onclick="sortTable('top5')" style="cursor:pointer;user-select:none;">Top 5 % <span id="sort-top5"></span></th>
+                <th onclick="sortTable('top10')" style="cursor:pointer;user-select:none;">Top 10 % <span id="sort-top10"></span></th>
+                <th onclick="sortTable('top20')" style="cursor:pointer;user-select:none;">Top 20 % <span id="sort-top20"></span></th>
+                <th onclick="sortTable('make_cut')" style="cursor:pointer;user-select:none;">Make Cut % <span id="sort-make_cut"></span></th>
+                <th onclick="sortTable('fit')" style="cursor:pointer;user-select:none;">Course Fit <span id="sort-fit"></span></th>
+                <th onclick="sortTable('history')" style="cursor:pointer;user-select:none;">Course History <span id="sort-history"></span></th>
+                <th onclick="sortTable('dna')" style="cursor:pointer;user-select:none;">DNA Score <span id="sort-dna"></span></th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -352,16 +354,54 @@ function renderSummary() {
   }).join("");
 }
 
+let currentSort = { col: "win", dir: "desc" };
+
+function sortTable(col) {
+  if (currentSort.col === col) {
+    currentSort.dir = currentSort.dir === "desc" ? "asc" : "desc";
+  } else {
+    currentSort.col = col;
+    currentSort.dir = col === "name" ? "asc" : "desc";
+  }
+  // Update sort indicators
+  const cols = ["rank","name","win","top5","top10","top20","make_cut","fit","history","dna"];
+  cols.forEach(c => {
+    const el = document.getElementById("sort-" + c);
+    if (el) el.innerHTML = "";
+  });
+  const activeEl = document.getElementById("sort-" + col);
+  if (activeEl) activeEl.innerHTML = currentSort.dir === "desc" ? "&#9660;" : "&#9650;";
+  // Also sync the dropdown
+  const sortMap = { win:"win", top10:"top10", dna:"dna", make_cut:"make_cut" };
+  if (sortMap[col]) document.getElementById("fSort").value = sortMap[col];
+  renderTable();
+}
+
 function renderTable() {
   const filter = document.getElementById("fFilter").value;
   const sort = document.getElementById("fSort").value;
   let list = [...allPlayers];
   if (filter === "avail") list = list.filter(p => !p.used);
   if (filter === "top25") list = list.filter(p => p.rank <= 25);
-  if (sort === "win") list.sort((a, b) => b.win - a.win);
-  else if (sort === "top10") list.sort((a, b) => b.top10 - a.top10);
-  else if (sort === "dna") list.sort((a, b) => b.dna - a.dna);
-  else if (sort === "make_cut") list.sort((a, b) => b.make_cut - a.make_cut);
+
+  // Use header click sort if active, otherwise use dropdown
+  const col = currentSort.col;
+  const dir = currentSort.dir;
+  list.sort((a, b) => {
+    let aVal, bVal;
+    if (col === "name") { aVal = a.name; bVal = b.name; return dir === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal); }
+    if (col === "rank") { aVal = a.rank; bVal = b.rank; }
+    else if (col === "win") { aVal = a.win; bVal = b.win; }
+    else if (col === "top5") { aVal = a.top5; bVal = b.top5; }
+    else if (col === "top10") { aVal = a.top10; bVal = b.top10; }
+    else if (col === "top20") { aVal = a.top20; bVal = b.top20; }
+    else if (col === "make_cut") { aVal = a.make_cut; bVal = b.make_cut; }
+    else if (col === "fit") { aVal = a.fit; bVal = b.fit; }
+    else if (col === "history") { aVal = a.history; bVal = b.history; }
+    else if (col === "dna") { aVal = a.dna; bVal = b.dna; }
+    else { aVal = a.win; bVal = b.win; }
+    return dir === "asc" ? aVal - bVal : bVal - aVal;
+  });
 
   const dnaMax = Math.max(...list.map(p => Math.abs(p.dna)), 0.01);
 
