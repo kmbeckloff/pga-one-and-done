@@ -288,13 +288,42 @@ async function loadData() {
     document.getElementById("eventName").textContent = eventName;
     document.getElementById("lastUpdated").textContent = "Updated: " + (preds.last_updated || "—");
 
-    const decompMap = {};
-    (decomp.players || []).forEach(p => { decompMap[p.player_name] = p; });
+   const decompMap = {};
+(decomp.players || decomp || []).forEach(p => { 
+  if(p && p.player_name) decompMap[p.player_name] = p; 
+});
 
-    const bettingMap = {};
-    (betting.odds || []).forEach(p => { bettingMap[p.player_name] = p; });
+const bettingMap = {};
+const bettingArr = betting.odds || betting.data || betting || [];
+(Array.isArray(bettingArr) ? bettingArr : []).forEach(p => { 
+  if(p && p.player_name) bettingMap[p.player_name] = p; 
+});
 
-    allPlayers = (preds.data || []).map((p, i) => {
+const predsArr = preds.data || [];
+const baseline = predsArr.filter(p => p && p.player_name);
+
+allPlayers = baseline.map((p, i) => {
+  const pName = p.player_name;
+  const d = decompMap[pName] || {};
+  const b = bettingMap[pName] || {};
+  const dna = dnaScore(d);
+  return {
+    name: pName,
+    rank: i + 1,
+    win: (p.win || 0) * 100,
+    top5: (p.top_5 || 0) * 100,
+    top10: (p.top_10 || 0) * 100,
+    top20: (p.top_20 || 0) * 100,
+    make_cut: (p.make_cut || 0) * 100,
+    fit: d.total_fit_adjustment || 0,
+    history: d.course_history_adjustment || 0,
+    approach: d.cf_approach_comp || 0,
+    shortgame: d.cf_short_comp || 0,
+    dna: dna,
+    dk_odds: b.draftkings || null,
+    used: isUsed(pName)
+  };
+}).sort((a, b) => b.win - a.win).map((p, i) => ({ ...p, rank: i + 1 }));
       const d = decompMap[p.player_name] || {};
       const b = bettingMap[p.player_name] || {};
       const dna = dnaScore(d);
