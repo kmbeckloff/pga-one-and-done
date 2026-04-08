@@ -24,17 +24,37 @@ export default async function handler(req, res) {
     const decomp = await decompRes.json();
     const betting = await bettingRes.json();
 
-    // Build a map from preds using baseline model
+    // Build predsMap — handle both array and nested object formats
     const predsMap = {};
-    if (preds.data && Array.isArray(preds.data)) {
-      preds.data.forEach(entry => {
-        if (entry.player_name) {
-          predsMap[entry.player_name] = entry;
-        }
+    const rawData = preds.data;
+
+    if (Array.isArray(rawData)) {
+      // Flat array format
+      rawData.forEach(entry => {
+        if (entry && entry.player_name) predsMap[entry.player_name] = entry;
       });
+    } else if (rawData && typeof rawData === 'object') {
+      // Nested object format — e.g. { baseline: [...], baseline_history_fit: [...] }
+      const nested = rawData.baseline || rawData.baseline_history_fit || [];
+      if (Array.isArray(nested)) {
+        nested.forEach(entry => {
+          if (entry && entry.player_name) predsMap[entry.player_name] = entry;
+        });
+      } else {
+        // Try iterating object values
+        Object.values(rawData).forEach(arr => {
+          if (Array.isArray(arr)) {
+            arr.forEach(entry => {
+              if (entry && entry.player_name && !predsMap[entry.player_name]) {
+                predsMap[entry.player_name] = entry;
+              }
+            });
+          }
+        });
+      }
     }
 
-    // Use decomp players as primary list — it has the full field
+    // Use decomp players as primary list
     const players = (decomp.players || []).map(p => {
       const pred = predsMap[p.player_name] || {};
       return {
@@ -52,12 +72,18 @@ export default async function handler(req, res) {
       };
     });
 
+    // Sort by final_pred descending as fallback ranking
+    players.sort((a, b) => b.final_pred - a.final_pred);
+
     res.status(200).json({
       event_name: preds.event_name || decomp.event_name,
       last_updated: preds.last_updated || decomp.last_updated,
       course_name: decomp.course_name || '',
       players: players,
-      betting_odds: betting.odds || []
+      betting_odds: betting.odds || [],
+      debug_preds_keys: Object.keys(preds),
+      debug_data_type: Array.isArray(rawData) ? 'array' : typeof rawData,
+      debug_data_keys: rawData && typeof rawData === 'object' ? Object.keys(rawData) : []
     });
 
   } catch (error) {
