@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     const rankArr = Array.isArray(rankPlayers) ? rankPlayers : Object.values(rankPlayers);
     rankArr.forEach(p => {
       if (!p) return;
-      if (p.dg_id) owgrMap[p.dg_id] = p.owgr || null;
+      if (p.dg_id) owgrMap[p.dg_id] = p.owgr_rank || null;
     });
 
     // Build betting map by dg_id
@@ -97,12 +97,11 @@ export default async function handler(req, res) {
         sg_arg: sgData.sg_arg !== undefined ? sgData.sg_arg : null,
         sg_app: sgData.sg_app !== undefined ? sgData.sg_app : null,
         sg_ott: sgData.sg_ott !== undefined ? sgData.sg_ott : null,
-        sg_t2g: sgData.sg_t2g !== undefined ? sgData.sg_t2g : null,
+        sg_t2g: (sgData.sg_app !== undefined && sgData.sg_arg !== undefined && sgData.sg_ott !== undefined) ? parseFloat((sgData.sg_app + sgData.sg_arg + sgData.sg_ott).toFixed(3)) : null,
         sg_total: sgData.sg_total !== undefined ? sgData.sg_total : null,
         driving_distance: sgData.driving_dist !== undefined ? sgData.driving_dist : null,
         driving_accuracy: sgData.driving_acc !== undefined ? sgData.driving_acc : null,
-        // Debug SG keys to confirm structure
-        sg_keys: Object.keys(sgData).slice(0, 8),
+
         // Betting
         dk_odds: dkOdds,
         dk_odds_str: bet.draftkings || null,
