@@ -1038,48 +1038,109 @@ function resetCols() {
 
 // ── FRL ANALYSIS ────────────────────────────────────────────────
 function renderFRL() {
-  // FRL correlates strongly with: SG OTT, driving distance, low scoring avg, form
-  // Score each player on FRL-specific factors
-  const frlScored = allPlayers.filter(p => p.dk_frl || p.win > 0.5).map(p => {
-    const ottScore = (p.sg_ott || 0) * 3;        // OTT most predictive for FRL
-    const appScore = (p.sg_app || 0) * 1.5;      // Approach matters round 1
-    const formScore = p.win * 0.8;               // Overall form
-    const histScore = (p.history || 0) * 2;      // Course history day 1
-    const frlScore = ottScore + appScore + formScore + histScore;
+  // FRL scoring: SG:OTT is the #1 predictor (big hitters go low rd1),
+  // followed by approach play, overall form, and course day-1 history.
+  // Darkhorse criteria: odds 1500+, elevated OTT or approach, low ownership expected.
 
-    // Implied FRL probability from DK odds
-    const frlImplied = p.dk_frl ? (p.dk_frl > 0 ? 100/(p.dk_frl+100)*100 : Math.abs(p.dk_frl)/(Math.abs(p.dk_frl)+100)*100) : null;
+  const scoreFRL = p => {
+    const ottScore  = (p.sg_ott  || 0) * 3.0;
+    const appScore  = (p.sg_app  || 0) * 1.5;
+    const argScore  = (p.sg_arg  || 0) * 0.8;
+    const formScore = p.win * 0.8;
+    const histScore = (p.history || 0) * 2.0;
+    const ageBonus  = (p.age && p.age < 28) ? 0.3 : 0; // young aggressive players go low early
+    return ottScore + appScore + argScore + formScore + histScore + ageBonus;
+  };
 
-    // FRL reasons
+  const all = allPlayers.filter(p => p.dk_frl || p.win > 0.3).map(p => ({
+    ...p,
+    frlScore: scoreFRL(p),
+    frlImplied: p.dk_frl ? (p.dk_frl > 0 ? 100/(p.dk_frl+100)*100 : Math.abs(p.dk_frl)/(Math.abs(p.dk_frl)+100)*100) : null
+  })).sort((a,b) => b.frlScore - a.frlScore);
+
+  // Top picks — high score, any odds range
+  const topFRL = all.slice(0, 8).map(p => {
     const reasons = [];
-    if ((p.sg_ott||0) > 0.5) reasons.push(`Elite driver — SG:OTT +${(p.sg_ott).toFixed(2)} (top predictor)`);
-    if ((p.sg_ott||0) > 0.3) reasons.push(`Strong off the tee SG +${(p.sg_ott||0).toFixed(2)}`);
-    if ((p.driving_distance||0) > 10) reasons.push(`Long hitter — distance advantage`);
-    if ((p.sg_app||0) > 0.6) reasons.push(`Lights-out iron play SG +${(p.sg_app||0).toFixed(2)}`);
-    if (p.history > 0.1) reasons.push(`Good round 1 course history`);
-    if (p.win > 8) reasons.push(`Overall tournament favorite`);
-    if (p.dk_frl && p.dk_frl > 400) reasons.push(`Value price at ${p.dk_frl>0?'+':''}${p.dk_frl}`);
+    if ((p.sg_ott||0) > 0.5)  reasons.push(`Elite driver SG:OTT +${p.sg_ott.toFixed(2)}`);
+    else if ((p.sg_ott||0) > 0.2) reasons.push(`Strong off tee SG:OTT +${p.sg_ott.toFixed(2)}`);
+    if ((p.driving_distance||0) > 10) reasons.push(`Distance advantage +${p.driving_distance.toFixed(0)} yds`);
+    if ((p.sg_app||0) > 0.6)  reasons.push(`Elite approach SG +${p.sg_app.toFixed(2)}`);
+    if (p.history > 0.1)       reasons.push(`Positive day-1 course history`);
+    if (p.win > 8)             reasons.push(`Overall tourney favorite`);
+    if ((p.age||30) < 27)      reasons.push(`Young aggressive style — low scoring round 1`);
+    if (p.dk_frl && p.dk_frl > 600) reasons.push(`Value price ${p.dk_frl>0?'+':''}${p.dk_frl}`);
+    return { ...p, frlReasons: reasons.slice(0,3) };
+  });
 
-    return { ...p, frlScore, frlImplied, frlReasons: reasons.slice(0,3) };
-  }).sort((a,b) => b.frlScore - a.frlScore).slice(0, 10);
+  // Darkhorse picks — odds 1500+, meaningful OTT or approach, editorial note
+  // We look for: strong ball-strikers priced as longshots, young guns, streaky putters
+  const DARKHORSE_NOTES = {
+    'Ludvig Aberg':      { note: 'Young Swede with elite ball-striking who tends to start fast. Massive distance advantage on day 1 when course is fresh. Priced too long given his SG profile.', tag: '🔥 Young gun' },
+    'Cameron Young':     { note: 'Consistently one of the longest hitters on tour — course suits his power game. Has shown ability to post low early rounds and contend on Sunday.', tag: '💣 Power play' },
+    'Nicolai Hojgaard':  { note: 'Aggressive young Dane who goes flag-hunting. High variance round 1 style could produce a 63-64 just as easily as a 72. Elite iron play when locked in.', tag: '🎯 Boom or bust' },
+    'Akshay Bhatia':     { note: 'One of the most electric ball-strikers in the field. Young, fearless, and has already shown major championship pedigree. Underpriced for FRL given his OTT numbers.', tag: '⚡ Sleeper alert' },
+    'Chris Gotterup':    { note: 'Legitimate long hitter with improving approach numbers. Augusta day 1 rewards bombers before the course tightens up — Gotterup fits that profile perfectly.', tag: '💣 Bomber' },
+    'Collin Morikawa':   { note: 'The best iron player in the world on his day. If Morikawa is dialed in on approach, a first round 65-66 is completely in play. Putting has cost him here before but the ball-striking is transcendent.', tag: '🎯 Iron wizard' },
+    'Min Woo Lee':       { note: 'Extremely aggressive style, plays fast and fearless. Has the game to go very low in round 1 when adrenaline is high. Underrated short game fits Augusta perfectly.', tag: '🔥 Aggressive' },
+    'Tommy Fleetwood':   { note: 'Fleetwood is a notoriously good major starter — tends to post low rounds early when the course plays friendly. Strong approach game ideally suited to Augusta National.', tag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Major starter' },
+    'Matt Fitzpatrick':  { note: 'Elite course management, precise iron play, and excellent Augusta history. Not a bomber but finds fairways and hits greens at a premium rate. A quintessential low-first-round type.', tag: '📐 Precision pick' },
+    'Hideki Matsuyama':  { note: 'Former Masters champion who knows Augusta intimately. Has posted multiple low opening rounds here. His combination of power and precision makes him a dangerous FRL candidate at his current price.', tag: '🏆 Champion pedigree' },
+  };
 
-  const nums = ['n1','n2','n3','nr','nr','nr','nr','nr','nr','nr'];
-  document.getElementById('frlList').innerHTML = frlScored.map((p,i) => `
-    <div class="pick-card">
-      <div class="pick-num ${nums[i]}">${i+1}</div>
-      <div class="pick-body">
-        <div class="pick-pname">${p.name} ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}</div>
-        <div class="pick-stats">
-          <span>FRL Score: ${p.frlScore.toFixed(2)}</span>
-          <span>Win%: ${p.win.toFixed(1)}%</span>
-          ${p.sg_ott!=null?`<span>SG:OTT: ${p.sg_ott>=0?'+':''}${(p.sg_ott).toFixed(2)}</span>`:''}
-          ${p.dk_frl?`<span>DK: ${p.dk_frl>0?'+':''}${p.dk_frl}</span>`:''}
+  const darkhorsePool = all.filter(p => {
+    const hasOdds = p.dk_frl && p.dk_frl >= 1500;
+    const hasNotes = !!DARKHORSE_NOTES[p.name];
+    const hasGame = (p.sg_ott||0) > 0.1 || (p.sg_app||0) > 0.3;
+    return (hasOdds || hasNotes) && hasGame;
+  }).slice(0, 5).map(p => ({
+    ...p,
+    dhNote: DARKHORSE_NOTES[p.name]?.note || `Underrated FRL candidate — SG:OTT ${p.sg_ott!=null?(p.sg_ott>=0?'+':'')+p.sg_ott.toFixed(2):'N/A'} with strong approach numbers. Long odds create excellent risk/reward for a single round bet.`,
+    dhTag: DARKHORSE_NOTES[p.name]?.tag || '🎲 Value play'
+  }));
+
+  const nums = ['n1','n2','n3','nr','nr','nr','nr','nr'];
+  document.getElementById('frlList').innerHTML = `
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px;">Model top picks</div>
+    ${topFRL.map((p,i) => `
+      <div class="pick-card">
+        <div class="pick-num ${nums[i]}">${i+1}</div>
+        <div class="pick-body">
+          <div class="pick-pname">${p.name} ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}</div>
+          <div class="pick-stats">
+            <span>FRL Score: <strong>${p.frlScore.toFixed(2)}</strong></span>
+            <span>Win%: ${p.win.toFixed(1)}%</span>
+            ${p.sg_ott!=null?`<span>SG:OTT: ${p.sg_ott>=0?'+':''}${p.sg_ott.toFixed(2)}</span>`:''}
+            ${p.dk_frl?`<span>DK: ${p.dk_frl>0?'+':''}${p.dk_frl}</span>`:''}
+          </div>
+          <div class="pick-reasons">${p.frlReasons.map(r=>`<span class="reason-tag">${r}</span>`).join('')}</div>
         </div>
-        <div class="pick-reasons">${p.frlReasons.map(r=>`<span class="reason-tag">${r}</span>`).join('')}</div>
-      </div>
-    </div>`).join('');
+      </div>`).join('')}
 
-  document.getElementById('frlOddsBody').innerHTML = frlScored.map(p => `<tr>
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:2px dashed var(--gold);"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);">Darkhorse FRL picks</div>
+      <div style="font-size:10px;background:var(--amber-light);color:var(--amber);padding:2px 8px;border-radius:999px;font-weight:600;">HIGH RISK / HIGH REWARD</div>
+    </div>
+    ${darkhorsePool.map(p => `
+      <div style="border:1px solid var(--gold);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;background:linear-gradient(135deg,#fffbeb,#fef9c3);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;font-weight:700;">${p.name}</span>
+            ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}
+            <span style="font-size:11px;background:var(--gold);color:white;padding:2px 8px;border-radius:999px;font-weight:600;">${p.dhTag}</span>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:800;color:var(--amber);">${p.dk_frl?`${p.dk_frl>0?'+':''}${p.dk_frl}`:'N/A'}</div>
+        </div>
+        <div style="font-size:12px;line-height:1.6;color:var(--text);margin-bottom:8px;">${p.dhNote}</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--text-muted);">
+          <span>Win: <strong>${p.win.toFixed(1)}%</strong></span>
+          ${p.sg_ott!=null?`<span>SG:OTT: <strong style="color:${p.sg_ott>=0?'#15803d':'var(--red)'};">${p.sg_ott>=0?'+':''}${p.sg_ott.toFixed(2)}</strong></span>`:''}
+          ${p.sg_app!=null?`<span>SG:App: <strong style="color:${p.sg_app>=0?'#15803d':'var(--red)'};">${p.sg_app>=0?'+':''}${p.sg_app.toFixed(2)}</strong></span>`:''}
+          <span>FRL Score: <strong>${p.frlScore.toFixed(2)}</strong></span>
+        </div>
+      </div>`).join('')}`;
+
+  document.getElementById('frlOddsBody').innerHTML = topFRL.map(p => `<tr>
     <td style="font-weight:500;">${p.name}</td>
     <td>${colorPct(p.win,[1,3,6,10])}</td>
     <td>${p.sg_ott!=null?sgBar(p.sg_ott,0.3,0.6):'<span class="cell-neutral">—</span>'}</td>
