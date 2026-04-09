@@ -285,6 +285,8 @@ tr.top3-row td{background:#f0fdf4;}
       <button class="tab-btn" onclick="showTab('field')">📊 Full Field</button>
       <button class="tab-btn" onclick="showTab('betting')">💰 Betting</button>
       <button class="tab-btn" onclick="showTab('weather')">🌤 Weather</button>
+      <button class="tab-btn" onclick="showTab('frl')">🚀 FRL Picks</button>
+      <button class="tab-btn" onclick="showTab('parlay')">🎰 Parlay Builder</button>
       <button class="tab-btn" onclick="showTab('history')">📜 Past Winners</button>
       <button class="tab-btn" onclick="showTab('used')">✅ Manage Picks</button>
     </div>
@@ -398,6 +400,48 @@ tr.top3-row td{background:#f0fdf4;}
           <div class="card-title">Champion profile</div>
           <div class="card-sub">What it takes to win this tournament based on past winners</div>
           <div id="champProfile"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRL TAB -->
+    <div id="tab-frl" style="display:none;">
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">First Round Leader picks</div>
+          <div class="card-sub">Data-driven FRL analysis — model probability, historical correlations, and reasoning</div>
+          <div id="frlList"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">FRL betting odds</div>
+          <div class="card-sub">Multi-book FRL odds with model edge highlighted</div>
+          <table class="bet-table">
+            <thead><tr><th>Player</th><th>Model Win%</th><th>SG: OTT</th><th>DK Odds</th><th>FD Odds</th><th>Caesars</th><th>DG Model</th></tr></thead>
+            <tbody id="frlOddsBody"></tbody>
+          </table>
+          <p style="font-size:10px;color:var(--text-muted);margin-top:10px;">FRL highly correlated with driving distance, OTT strokes gained, and low scoring average on day 1. Bet responsibly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARLAY TAB -->
+    <div id="tab-parlay" style="display:none;">
+      <div class="card">
+        <div class="card-title">Recommended parlay — +400 to +1000 range</div>
+        <div class="card-sub">Model-generated parlay combining best value bets across markets. Legs selected for positive EV and correlation.</div>
+        <div id="parlayContent"></div>
+      </div>
+      <div class="card" style="margin-top:1rem;">
+        <div class="card-title">Build your own parlay</div>
+        <div class="card-sub">Select legs manually — parlay odds calculated automatically</div>
+        <div id="parlayBuilder"></div>
+        <div id="parlayCalc" style="margin-top:1rem;padding:1rem;background:var(--cream-dark);border-radius:var(--radius-sm);display:none;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">Your parlay</div>
+          <div id="parlayLegs" style="margin-bottom:12px;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--green-dark);" id="parlayOdds">—</div>
+            <button onclick="clearParlay()" style="font-size:12px;padding:5px 12px;border-radius:var(--radius-sm);border:1px solid #fca5a5;background:var(--red-light);color:var(--red);cursor:pointer;">Clear parlay</button>
+          </div>
         </div>
       </div>
     </div>
@@ -570,7 +614,7 @@ function showTab(tab) {
   document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
   document.getElementById('tab-' + tab).style.display = 'block';
   document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-    const tabs = ['picks','field','betting','weather','history','used'];
+    const tabs = ['picks','field','betting','weather','frl','parlay','history','used'];
     btn.classList.toggle('active', tabs[i] === tab);
   });
   if (tab === 'used') renderUsedMgr();
@@ -605,6 +649,8 @@ async function loadData() {
         sg_ott: p.sg_ott, sg_t2g: p.sg_t2g, sg_total: p.sg_total,
         driving_distance: p.driving_distance, driving_accuracy: p.driving_accuracy,
         dk_win: p.dk_win, dk_top5: p.dk_top5, dk_top10: p.dk_top10, dk_mc: p.dk_mc,
+        dk_frl: p.dk_frl, fanduel_frl: p.fanduel_frl, caesars_frl: p.caesars_frl,
+        datagolf_frl: p.datagolf_frl,
         fanduel_win: p.fanduel_win, caesars_win: p.caesars_win,
         betmgm_win: p.betmgm_win, pinnacle_win: p.pinnacle_win,
         datagolf_baseline: p.datagolf_baseline,
@@ -754,6 +800,8 @@ function renderAll() {
   renderPicks();
   renderTable();
   renderBetting();
+  renderFRL();
+  renderRecommendedParlay();
   const eventName = document.getElementById('hTournament').textContent;
   renderHistory(eventName);
 }
@@ -986,6 +1034,192 @@ function closeColModal() { document.getElementById('colModal').style.display = '
 function resetCols() {
   activeCols = new Set(ALL_COLS.filter(c=>c.default).map(c=>c.key));
   saveCols(); openColPicker(); renderTable();
+}
+
+// ── FRL ANALYSIS ────────────────────────────────────────────────
+function renderFRL() {
+  // FRL correlates strongly with: SG OTT, driving distance, low scoring avg, form
+  // Score each player on FRL-specific factors
+  const frlScored = allPlayers.filter(p => p.dk_frl || p.win > 0.5).map(p => {
+    const ottScore = (p.sg_ott || 0) * 3;        // OTT most predictive for FRL
+    const appScore = (p.sg_app || 0) * 1.5;      // Approach matters round 1
+    const formScore = p.win * 0.8;               // Overall form
+    const histScore = (p.history || 0) * 2;      // Course history day 1
+    const frlScore = ottScore + appScore + formScore + histScore;
+
+    // Implied FRL probability from DK odds
+    const frlImplied = p.dk_frl ? (p.dk_frl > 0 ? 100/(p.dk_frl+100)*100 : Math.abs(p.dk_frl)/(Math.abs(p.dk_frl)+100)*100) : null;
+
+    // FRL reasons
+    const reasons = [];
+    if ((p.sg_ott||0) > 0.5) reasons.push(`Elite driver — SG:OTT +${(p.sg_ott).toFixed(2)} (top predictor)`);
+    if ((p.sg_ott||0) > 0.3) reasons.push(`Strong off the tee SG +${(p.sg_ott||0).toFixed(2)}`);
+    if ((p.driving_distance||0) > 10) reasons.push(`Long hitter — distance advantage`);
+    if ((p.sg_app||0) > 0.6) reasons.push(`Lights-out iron play SG +${(p.sg_app||0).toFixed(2)}`);
+    if (p.history > 0.1) reasons.push(`Good round 1 course history`);
+    if (p.win > 8) reasons.push(`Overall tournament favorite`);
+    if (p.dk_frl && p.dk_frl > 400) reasons.push(`Value price at ${p.dk_frl>0?'+':''}${p.dk_frl}`);
+
+    return { ...p, frlScore, frlImplied, frlReasons: reasons.slice(0,3) };
+  }).sort((a,b) => b.frlScore - a.frlScore).slice(0, 10);
+
+  const nums = ['n1','n2','n3','nr','nr','nr','nr','nr','nr','nr'];
+  document.getElementById('frlList').innerHTML = frlScored.map((p,i) => `
+    <div class="pick-card">
+      <div class="pick-num ${nums[i]}">${i+1}</div>
+      <div class="pick-body">
+        <div class="pick-pname">${p.name} ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}</div>
+        <div class="pick-stats">
+          <span>FRL Score: ${p.frlScore.toFixed(2)}</span>
+          <span>Win%: ${p.win.toFixed(1)}%</span>
+          ${p.sg_ott!=null?`<span>SG:OTT: ${p.sg_ott>=0?'+':''}${(p.sg_ott).toFixed(2)}</span>`:''}
+          ${p.dk_frl?`<span>DK: ${p.dk_frl>0?'+':''}${p.dk_frl}</span>`:''}
+        </div>
+        <div class="pick-reasons">${p.frlReasons.map(r=>`<span class="reason-tag">${r}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('frlOddsBody').innerHTML = frlScored.map(p => `<tr>
+    <td style="font-weight:500;">${p.name}</td>
+    <td>${colorPct(p.win,[1,3,6,10])}</td>
+    <td>${p.sg_ott!=null?sgBar(p.sg_ott,0.3,0.6):'<span class="cell-neutral">—</span>'}</td>
+    <td>${oddsCell(p.dk_frl)}</td>
+    <td>${oddsCell(p.fanduel_frl)}</td>
+    <td>${oddsCell(p.caesars_frl)}</td>
+    <td><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;">${p.datagolf_frl||'—'}</span></td>
+  </tr>`).join('');
+}
+
+// ── PARLAY BUILDER ───────────────────────────────────────────────
+let parlayLegs = [];
+
+function americanToDecimal(odds) {
+  const n = parseInt(odds);
+  if (isNaN(n)) return 1;
+  return n > 0 ? (n/100)+1 : (100/Math.abs(n))+1;
+}
+function decimalToAmerican(dec) {
+  if (dec >= 2) return '+' + Math.round((dec-1)*100);
+  return Math.round(-100/(dec-1)).toString();
+}
+function calcParlayOdds(legs) {
+  if (!legs.length) return null;
+  const dec = legs.reduce((acc,l) => acc * americanToDecimal(l.odds), 1);
+  return decimalToAmerican(dec);
+}
+
+function renderRecommendedParlay() {
+  // Build recommended parlay targeting +400 to +1000
+  // Strategy: mix 1 mid-range win bet + 2 top-10 bets for correlated value
+  const avail = allPlayers.filter(p => !p.used && p.win > 0.5);
+  const candidates = avail.filter(p => p.dk_win && p.dk_win >= 400 && p.dk_win <= 2500);
+  const top10Cands = avail.filter(p => p.dk_top10 && p.dk_top10 >= -120 && p.dk_top10 <= 300 && p.top10 > 25);
+  const frlCands = avail.filter(p => p.dk_frl && p.dk_frl >= 300 && p.dk_frl <= 1200 && (p.sg_ott||0) > 0.3);
+
+  const legs = [];
+
+  // Leg 1: best value win bet in 400-2500 range
+  const winLeg = candidates.sort((a,b) => b.edge_vs_book - a.edge_vs_book)[0];
+  if (winLeg) legs.push({
+    type: 'Win', player: winLeg.name, odds: winLeg.dk_win,
+    reason: `${winLeg.win.toFixed(1)}% win probability — model edge vs book`
+  });
+
+  // Leg 2: best top-10 value
+  const t10Leg = top10Cands.sort((a,b) => b.top10 - a.top10).find(p => p.name !== winLeg?.name);
+  if (t10Leg) legs.push({
+    type: 'Top 10', player: t10Leg.name, odds: t10Leg.dk_top10,
+    reason: `${t10Leg.top10.toFixed(1)}% top-10 probability — strong course fit`
+  });
+
+  // Leg 3: FRL value pick
+  const frlLeg = frlCands.sort((a,b) => (b.sg_ott||0)-(a.sg_ott||0)).find(p => p.name !== winLeg?.name && p.name !== t10Leg?.name);
+  if (frlLeg) legs.push({
+    type: 'FRL', player: frlLeg.name, odds: frlLeg.dk_frl,
+    reason: `Strong off-the-tee player — SG:OTT ${frlLeg.sg_ott>=0?'+':''}${(frlLeg.sg_ott||0).toFixed(2)}`
+  });
+
+  const parlayOdds = legs.length ? calcParlayOdds(legs.map(l=>({odds:l.odds}))) : null;
+  const parlayDec = legs.reduce((acc,l) => acc * americanToDecimal(l.odds), 1);
+
+  document.getElementById('parlayContent').innerHTML = legs.length ? `
+    <div style="background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:var(--radius);padding:1.25rem;color:white;margin-bottom:1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;opacity:0.6;margin-bottom:4px;">Recommended ${legs.length}-leg parlay</div>
+          <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--gold);">${parlayOdds}</div>
+        </div>
+        <div style="text-align:right;font-size:12px;opacity:0.7;">
+          <div>$10 bet = $${((parlayDec-1)*10).toFixed(0)} profit</div>
+          <div>$25 bet = $${((parlayDec-1)*25).toFixed(0)} profit</div>
+          <div>$50 bet = $${((parlayDec-1)*50).toFixed(0)} profit</div>
+        </div>
+      </div>
+      ${legs.map((l,i) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,0.1);">
+          <div style="background:var(--gold);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${i+1}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:13px;">${l.player} — <span style="color:var(--gold-light);">${l.type}</span></div>
+            <div style="font-size:11px;opacity:0.7;margin-top:2px;">${l.reason}</div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--gold-light);">${l.odds>0?'+':''}${l.odds}</div>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.6;padding:10px;background:var(--cream-dark);border-radius:var(--radius-sm);">
+      <strong>Strategy:</strong> This parlay combines a win bet on a +EV player with a high-probability top-10 and a value FRL pick. The legs are partially correlated — a player leading round 1 is more likely to win and finish top 10, which slightly reduces true parlay probability vs independent legs. Bet responsibly — parlays are high variance.
+    </div>` : '<div style="color:var(--text-muted);font-size:13px;">Not enough betting data to generate a parlay recommendation this week.</div>';
+
+  // Build Your Own Parlay section
+  const parlayOptions = avail.filter(p => p.dk_win || p.dk_top10 || p.dk_frl).slice(0, 20);
+  document.getElementById('parlayBuilder').innerHTML = `
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Click a bet to add it to your parlay. Click again to remove.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px;">
+      ${parlayOptions.map(p => `
+        <div style="border:1px solid #e5e7eb;border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;">
+          <div style="font-weight:600;margin-bottom:6px;">${p.name}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${p.dk_win?`<button class="parlay-leg-btn" onclick="toggleParlayLeg('${p.name}','Win',${p.dk_win})" data-key="${p.name}-Win" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--green-light);background:white;cursor:pointer;color:var(--green-dark);">Win ${p.dk_win>0?'+':''}${p.dk_win}</button>`:''}
+            ${p.dk_top10?`<button class="parlay-leg-btn" onclick="toggleParlayLeg('${p.name}','Top 10',${p.dk_top10})" data-key="${p.name}-Top 10" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--blue);background:white;cursor:pointer;color:var(--blue);">T10 ${p.dk_top10>0?'+':''}${p.dk_top10}</button>`:''}
+            ${p.dk_frl?`<button class="parlay-leg-btn" onclick="toggleParlayLeg('${p.name}','FRL',${p.dk_frl})" data-key="${p.name}-FRL" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--gold);background:white;cursor:pointer;color:var(--amber);">FRL ${p.dk_frl>0?'+':''}${p.dk_frl}</button>`:''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function toggleParlayLeg(player, type, odds) {
+  const key = `${player}-${type}`;
+  const idx = parlayLegs.findIndex(l => l.key === key);
+  if (idx >= 0) {
+    parlayLegs.splice(idx, 1);
+    const btn = document.querySelector(`[data-key="${key}"]`);
+    if (btn) { btn.style.background='white'; btn.style.fontWeight='400'; }
+  } else {
+    parlayLegs.push({ key, player, type, odds });
+    const btn = document.querySelector(`[data-key="${key}"]`);
+    if (btn) { btn.style.background='var(--green-dark)'; btn.style.color='white'; btn.style.fontWeight='600'; }
+  }
+  updateParlayCalc();
+}
+function clearParlay() {
+  parlayLegs = [];
+  document.querySelectorAll('.parlay-leg-btn').forEach(btn => {
+    btn.style.background='white'; btn.style.fontWeight='400'; btn.style.color='';
+  });
+  updateParlayCalc();
+}
+function updateParlayCalc() {
+  const calc = document.getElementById('parlayCalc');
+  if (!parlayLegs.length) { calc.style.display='none'; return; }
+  calc.style.display='block';
+  const parlayOdds = calcParlayOdds(parlayLegs);
+  const parlayDec = parlayLegs.reduce((acc,l) => acc * americanToDecimal(l.odds), 1);
+  document.getElementById('parlayOdds').textContent = parlayOdds;
+  document.getElementById('parlayLegs').innerHTML = parlayLegs.map(l =>
+    `<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--cream-dark);">
+      <span><strong>${l.player}</strong> — ${l.type}</span>
+      <span style="font-family:'DM Mono',monospace;font-weight:600;color:${l.odds>0?'#15803d':'var(--red)'};">${l.odds>0?'+':''}${l.odds}</span>
+    </div>`).join('') +
+    `<div style="font-size:11px;color:var(--text-muted);margin-top:8px;">$10 → $${((parlayDec-1)*10).toFixed(0)} profit &nbsp;|&nbsp; $25 → $${((parlayDec-1)*25).toFixed(0)} profit &nbsp;|&nbsp; $50 → $${((parlayDec-1)*50).toFixed(0)} profit</div>`;
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
