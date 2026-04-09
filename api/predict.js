@@ -22,16 +22,18 @@ export default async function handler(req, res) {
     ]);
 
     // Batch 2 — additional betting markets (best effort)
-    let bettingTop10 = {}, bettingMC = {}, matchups = {};
+    let bettingTop10 = {}, bettingMC = {}, matchups = {}, bettingFRL = {};
     try {
-      const [t10Res, mcRes, muRes] = await Promise.all([
+      const [t10Res, mcRes, muRes, frlRes] = await Promise.all([
         fetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
         fetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=make_cut&odds_format=american&file_format=json&key=${key}`),
-        fetch(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`)
+        fetch(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`),
+        fetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=frl&odds_format=american&file_format=json&key=${key}`)
       ]);
       bettingTop10 = await t10Res.json();
       bettingMC = await mcRes.json();
       matchups = await muRes.json();
+      bettingFRL = await frlRes.json();
     } catch(e) { /* non-fatal */ }
 
     // Build maps
@@ -59,6 +61,9 @@ export default async function handler(req, res) {
 
     const betMCMap = {};
     (bettingMC.odds || []).forEach(p => { if (p?.dg_id) betMCMap[p.dg_id] = p; });
+
+    const betFRLMap = {};
+    (bettingFRL.odds || []).forEach(p => { if (p?.dg_id) betFRLMap[p.dg_id] = p; });
 
     // Build players
     const players = (decomp.players || []).map(p => {
@@ -127,6 +132,10 @@ export default async function handler(req, res) {
         driving_distance: sg.driving_dist ?? null,
         driving_accuracy: sg.driving_acc ?? null,
         dk_win, dk_top10, dk_mc,
+        dk_frl: (() => { const b = betFRLMap[p.dg_id]||{}; return b.draftkings ? parseInt(String(b.draftkings).replace('+','')) : null; })(),
+        fanduel_frl: (betFRLMap[p.dg_id]||{}).fanduel || null,
+        caesars_frl: (betFRLMap[p.dg_id]||{}).caesars || null,
+        datagolf_frl: (betFRLMap[p.dg_id]||{}).datagolf?.baseline || null,
         fanduel_win: bWin.fanduel || null,
         caesars_win: bWin.caesars || null,
         betmgm_win: bWin.betmgm || null,
