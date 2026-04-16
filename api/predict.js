@@ -29,8 +29,12 @@ export default async function handler(req, res) {
     // Batch 2 — additional betting markets (each independently best-effort)
     let bettingTop10 = {}, bettingMC = {}, matchups = {}, bettingFRL = {};
     const safeFetch = async (url) => {
-      try { const r = await fetch(url); if (!r.ok) return {}; return await r.json(); }
-      catch(e) { return {}; }
+      try {
+        const r = await fetch(url);
+        if (!r.ok) return { odds: [], matchups: [] };
+        const data = await r.json();
+        return data && typeof data === 'object' ? data : { odds: [], matchups: [] };
+      } catch(e) { return { odds: [], matchups: [] }; }
     };
     [bettingTop10, bettingMC, matchups, bettingFRL] = await Promise.all([
       safeFetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
