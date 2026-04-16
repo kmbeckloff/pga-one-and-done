@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (!key) return res.status(500).json({ error: 'API key not configured' });
 
   try {
-    // Batch 1 — core data (always needed)
+    // Batch 1 — core data
     const [predsRes, decompRes, bettingRes, sgRes, rankingsRes] = await Promise.all([
       fetch(`https://feeds.datagolf.com/preds/pre-tournament?tour=pga&dead_heat=no&odds_format=percent&file_format=json&key=${key}`),
       fetch(`https://feeds.datagolf.com/preds/player-decompositions?tour=pga&file_format=json&key=${key}`),
@@ -17,24 +17,27 @@ export default async function handler(req, res) {
       fetch(`https://feeds.datagolf.com/preds/get-dg-rankings?file_format=json&key=${key}`)
     ]);
 
-    const [preds, decomp, betting, sgRaw, rankingsRaw] = await Promise.all([
-      predsRes.json(), decompRes.json(), bettingRes.json(), sgRes.json(), rankingsRes.json()
-    ]);
+    if (!predsRes.ok) throw new Error(`Predictions endpoint returned ${predsRes.status}`);
+    if (!decompRes.ok) throw new Error(`Decompositions endpoint returned ${decompRes.status}`);
 
-    // Batch 2 — additional betting markets (best effort)
+    const preds = await predsRes.json();
+    const decomp = await decompRes.json();
+    const betting = bettingRes.ok ? await bettingRes.json() : {};
+    const sgRaw = sgRes.ok ? await sgRes.json() : {};
+    const rankingsRaw = rankingsRes.ok ? await rankingsRes.json() : {};
+
+    // Batch 2 — additional betting markets (each independently best-effort)
     let bettingTop10 = {}, bettingMC = {}, matchups = {}, bettingFRL = {};
-    try {
-      const [t10Res, mcRes, muRes, frlRes] = await Promise.all([
-        fetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
-        fetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=make_cut&odds_format=american&file_format=json&key=${key}`),
-        fetch(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`),
-        fetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=frl&odds_format=american&file_format=json&key=${key}`)
-      ]);
-      bettingTop10 = await t10Res.json();
-      bettingMC = await mcRes.json();
-      matchups = await muRes.json();
-      bettingFRL = await frlRes.json();
-    } catch(e) { /* non-fatal */ }
+    const safeFetch = async (url) => {
+      try { const r = await fetch(url); if (!r.ok) return {}; return await r.json(); }
+      catch(e) { return {}; }
+    };
+    [bettingTop10, bettingMC, matchups, bettingFRL] = await Promise.all([
+      safeFetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
+      safeFetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=make_cut&odds_format=american&file_format=json&key=${key}`),
+      safeFetch(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`),
+      safeFetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=frl&odds_format=american&file_format=json&key=${key}`)
+    ]);
 
     // Build maps
     const predsArray = preds.baseline || [];
@@ -149,8 +152,18 @@ export default async function handler(req, res) {
 
     players.sort((a,b) => b.win - a.win);
 
-    // Event location — default to Augusta for Masters
-    const eventLocation = { lat: 33.5031, lon: -82.0219, name: 'Augusta, GA' };
+    // Event location — map common tournaments, fallback to Harbour Town for RBC
+    const LOCATIONS = {
+      'Masters Tournament':     { lat: 33.5031, lon: -82.0219, name: 'Augusta, GA' },
+      'RBC Heritage':           { lat: 32.1416, lon: -80.8392, name: 'Hilton Head Island, SC' },
+      'Truist Championship':    { lat: 33.0282, lon: -84.5773, name: 'Peachtree City, GA' },
+      'PGA Championship':       { lat: 35.1495, lon: -80.8439, name: 'Charlotte, NC' },
+      'U.S. Open':              { lat: 40.6259, lon: -74.0594, name: 'Shinnecock Hills, NY' },
+      'The Open Championship':  { lat: 55.3781, lon: -3.4360,  name: 'Scotland, UK' },
+      'The Players Championship': { lat: 30.1975, lon: -81.3964, name: 'Ponte Vedra Beach, FL' },
+      'Memorial Tournament':    { lat: 40.0992, lon: -83.1521, name: 'Dublin, OH' },
+    };
+    const eventLocation = LOCATIONS[preds.event_name] || { lat: 33.5031, lon: -82.0219, name: 'Tournament Location' };
 
     res.status(200).json({
       event_name: preds.event_name,
