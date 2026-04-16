@@ -7,178 +7,163 @@ export default async function handler(req, res) {
   const key = process.env.DATAGOLF_API_KEY;
   if (!key) return res.status(500).json({ error: 'API key not configured' });
 
+  const sf = async (url) => {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) return {};
+      const text = await r.text();
+      try { return JSON.parse(text); } catch(e) { return {}; }
+    } catch(e) { return {}; }
+  };
+
+  const sa = (v) => Array.isArray(v) ? v : [];
+
   try {
-    // Batch 1 — core data
-    const [predsRes, decompRes, bettingRes, sgRes, rankingsRes] = await Promise.all([
-      fetch(`https://feeds.datagolf.com/preds/pre-tournament?tour=pga&dead_heat=no&odds_format=percent&file_format=json&key=${key}`),
-      fetch(`https://feeds.datagolf.com/preds/player-decompositions?tour=pga&file_format=json&key=${key}`),
-      fetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=win&odds_format=american&file_format=json&key=${key}`),
-      fetch(`https://feeds.datagolf.com/preds/skill-ratings?display=value&file_format=json&key=${key}`),
-      fetch(`https://feeds.datagolf.com/preds/get-dg-rankings?file_format=json&key=${key}`)
+    const [preds, decomp, betWin, sg, rankings, betT10, betMC, betFRL, mu] = await Promise.all([
+      sf(`https://feeds.datagolf.com/preds/pre-tournament?tour=pga&dead_heat=no&odds_format=percent&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/preds/player-decompositions?tour=pga&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=win&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/preds/skill-ratings?display=value&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/preds/get-dg-rankings?file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=make_cut&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=frl&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`)
     ]);
 
-    if (!predsRes.ok) throw new Error(`Predictions endpoint returned ${predsRes.status}`);
-    if (!decompRes.ok) throw new Error(`Decompositions endpoint returned ${decompRes.status}`);
+    if (!decomp.players) {
+      return res.status(500).json({ error: 'No player data from DataGolf. Check your API key in Vercel environment variables.' });
+    }
 
-    const preds = await predsRes.json();
-    const decomp = await decompRes.json();
-    const betting = bettingRes.ok ? await bettingRes.json() : {};
-    const sgRaw = sgRes.ok ? await sgRes.json() : {};
-    const rankingsRaw = rankingsRes.ok ? await rankingsRes.json() : {};
-
-    // Batch 2 — additional betting markets (each independently best-effort)
-    let bettingTop10 = {}, bettingMC = {}, matchups = {}, bettingFRL = {};
-    const safeFetch = async (url) => {
-      try {
-        const r = await fetch(url);
-        if (!r.ok) return { odds: [], matchups: [] };
-        const data = await r.json();
-        return data && typeof data === 'object' ? data : { odds: [], matchups: [] };
-      } catch(e) { return { odds: [], matchups: [] }; }
-    };
-    [bettingTop10, bettingMC, matchups, bettingFRL] = await Promise.all([
-      safeFetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
-      safeFetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=make_cut&odds_format=american&file_format=json&key=${key}`),
-      safeFetch(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`),
-      safeFetch(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=frl&odds_format=american&file_format=json&key=${key}`)
-    ]);
-
-    // Build maps
-    const predsArray = preds.baseline || [];
-    const predsMapById = {}, predsMapByName = {};
-    predsArray.forEach(e => {
-      if (!e) return;
-      if (e.dg_id) predsMapById[e.dg_id] = e;
-      if (e.player_name) predsMapByName[e.player_name.toLowerCase()] = e;
+    const predsMap = {};
+    sa(preds.baseline).forEach(p => {
+      if (!p) return;
+      if (p.dg_id) predsMap[p.dg_id] = p;
+      if (p.player_name) predsMap[p.player_name.toLowerCase()] = p;
     });
 
     const sgMap = {};
-    const sgArr = Array.isArray(sgRaw) ? sgRaw : (sgRaw.players || []);
-    sgArr.forEach(p => { if (p?.dg_id) sgMap[p.dg_id] = p; });
+    sa(sg.players || sg).forEach(p => { if (p && p.dg_id) sgMap[p.dg_id] = p; });
 
     const owgrMap = {};
-    const rankArr = Array.isArray(rankingsRaw) ? rankingsRaw : (rankingsRaw.rankings || []);
-    rankArr.forEach(p => { if (p?.dg_id) owgrMap[p.dg_id] = p.owgr_rank || null; });
+    sa(rankings.rankings || rankings).forEach(p => { if (p && p.dg_id) owgrMap[p.dg_id] = p.owgr_rank || null; });
 
-    const betWinMap = {};
-    (betting.odds || []).forEach(p => { if (p?.dg_id) betWinMap[p.dg_id] = p; });
+    const bWinMap = {}, bT10Map = {}, bMCMap = {}, bFRLMap = {};
+    sa(betWin.odds).forEach(p => { if (p && p.dg_id) bWinMap[p.dg_id] = p; });
+    sa(betT10.odds).forEach(p => { if (p && p.dg_id) bT10Map[p.dg_id] = p; });
+    sa(betMC.odds).forEach(p => { if (p && p.dg_id) bMCMap[p.dg_id] = p; });
+    sa(betFRL.odds).forEach(p => { if (p && p.dg_id) bFRLMap[p.dg_id] = p; });
 
-    const betT10Map = {};
-    (bettingTop10.odds || []).forEach(p => { if (p?.dg_id) betT10Map[p.dg_id] = p; });
+    const parseOdds = (v) => {
+      if (!v) return null;
+      const n = parseInt(String(v).replace('+', ''));
+      return isNaN(n) ? null : n;
+    };
 
-    const betMCMap = {};
-    (bettingMC.odds || []).forEach(p => { if (p?.dg_id) betMCMap[p.dg_id] = p; });
+    const impliedPct = (odds) => {
+      if (!odds) return null;
+      return odds > 0 ? 100 / (odds + 100) * 100 : Math.abs(odds) / (Math.abs(odds) + 100) * 100;
+    };
 
-    const betFRLMap = {};
-    (bettingFRL.odds || []).forEach(p => { if (p?.dg_id) betFRLMap[p.dg_id] = p; });
+    const players = sa(decomp.players).map(p => {
+      if (!p) return null;
+      const pred = predsMap[p.dg_id] || predsMap[(p.player_name || '').toLowerCase()] || {};
+      const s = sgMap[p.dg_id] || {};
+      const bw = bWinMap[p.dg_id] || {};
+      const bt = bT10Map[p.dg_id] || {};
+      const bm = bMCMap[p.dg_id] || {};
+      const bf = bFRLMap[p.dg_id] || {};
 
-    // Build players
-    const players = (decomp.players || []).map(p => {
-      const pred = predsMapById[p.dg_id] || predsMapByName[p.player_name.toLowerCase()] || {};
-      const sg = sgMap[p.dg_id] || {};
-      const bWin = betWinMap[p.dg_id] || {};
-      const bT10 = betT10Map[p.dg_id] || {};
-      const bMC = betMCMap[p.dg_id] || {};
-
-      const parseOdds = (v) => v ? parseInt(String(v).replace('+','')) : null;
-      const dk_win = parseOdds(bWin.draftkings);
-      const dk_top10 = parseOdds(bT10.draftkings);
-      const dk_mc = parseOdds(bMC.draftkings);
-
+      const dk_win = parseOdds(bw.draftkings);
+      const dk_top10 = parseOdds(bt.draftkings);
+      const dk_mc = parseOdds(bm.draftkings);
+      const dk_frl = parseOdds(bf.draftkings);
       const fit = p.total_fit_adjustment || 0;
       const hist = p.course_history_adjustment || 0;
       const app = p.cf_approach_comp || 0;
-      const sg_game = p.cf_short_comp || 0;
-      const dna = (fit*0.35)+(hist*0.30)+(app*0.20)+(sg_game*0.15);
-      const winPct = (pred.win||0)*100;
-      const bookImplied = dk_win ? (dk_win>0 ? 100/(dk_win+100)*100 : Math.abs(dk_win)/(Math.abs(dk_win)+100)*100) : null;
-      const edge = bookImplied ? winPct - bookImplied : 0;
+      const sgg = p.cf_short_comp || 0;
+      const dna = (fit * 0.35) + (hist * 0.30) + (app * 0.20) + (sgg * 0.15);
+      const winPct = (pred.win || 0) * 100;
+      const bookImp = impliedPct(dk_win);
+      const edge = bookImp ? winPct - bookImp : 0;
 
-      // Generate pick reasons
       const reasons = [];
       if (winPct > 10) reasons.push(`Elite win probability ${winPct.toFixed(1)}%`);
       else if (winPct > 5) reasons.push(`Strong ${winPct.toFixed(1)}% win probability`);
       if (hist > 0.1) reasons.push(`Excellent course history (+${hist.toFixed(2)})`);
       if (dna > 0.15) reasons.push(`Strong DNA fit score ${dna.toFixed(3)}`);
-      if ((sg.sg_app||0) > 0.6) reasons.push(`Elite approach play SG +${sg.sg_app.toFixed(2)}`);
-      if ((sg.sg_putt||0) > 0.4) reasons.push(`Hot putter SG +${sg.sg_putt.toFixed(2)}`);
-      if ((sg.sg_ott||0) > 0.6) reasons.push(`Driving dominance SG +${sg.sg_ott.toFixed(2)}`);
-      if (edge > 2) reasons.push(`Model shows +${edge.toFixed(1)}% edge vs DraftKings`);
-      if ((p.major_adjustment||0) > 0.08) reasons.push(`Strong major performer`);
-      if ((pred.top_10||0)*100 > 40) reasons.push(`${((pred.top_10||0)*100).toFixed(0)}% top-10 probability`);
+      if ((s.sg_app || 0) > 0.6) reasons.push(`Elite approach play SG +${s.sg_app.toFixed(2)}`);
+      if ((s.sg_putt || 0) > 0.4) reasons.push(`Hot putter SG +${s.sg_putt.toFixed(2)}`);
+      if ((s.sg_ott || 0) > 0.6) reasons.push(`Driving dominance SG +${s.sg_ott.toFixed(2)}`);
+      if (edge > 2) reasons.push(`+${edge.toFixed(1)}% edge vs DraftKings`);
+      if ((p.major_adjustment || 0) > 0.08) reasons.push(`Strong major performer`);
+      if ((pred.top_10 || 0) * 100 > 40) reasons.push(`${((pred.top_10 || 0) * 100).toFixed(0)}% top-10 probability`);
+
+      const sg_app = s.sg_app ?? null;
+      const sg_arg = s.sg_arg ?? null;
+      const sg_ott = s.sg_ott ?? null;
 
       return {
-        player_name: p.player_name,
+        player_name: p.player_name || '',
         dg_id: p.dg_id,
         country: p.country || '',
-        age: p.age,
+        age: p.age || null,
         owgr: owgrMap[p.dg_id] || null,
         win: winPct,
-        top_5: (pred.top_5||0)*100,
-        top_10: (pred.top_10||0)*100,
-        top_20: (pred.top_20||0)*100,
-        make_cut: (pred.make_cut||0)*100,
+        top_5: (pred.top_5 || 0) * 100,
+        top_10: (pred.top_10 || 0) * 100,
+        top_20: (pred.top_20 || 0) * 100,
+        make_cut: (pred.make_cut || 0) * 100,
         total_fit_adjustment: fit,
         course_history_adjustment: hist,
         cf_approach_comp: app,
-        cf_short_comp: sg_game,
-        dna,
-        final_pred: p.final_pred || 0,
+        cf_short_comp: sgg,
+        dna, final_pred: p.final_pred || 0,
         baseline_pred: p.baseline_pred || 0,
         age_adjustment: p.age_adjustment || 0,
         driving_distance_adjustment: p.driving_distance_adjustment || 0,
         driving_accuracy_adjustment: p.driving_accuracy_adjustment || 0,
         major_adjustment: p.major_adjustment || 0,
         timing_adjustment: p.timing_adjustment || 0,
-        sg_putt: sg.sg_putt ?? null,
-        sg_arg: sg.sg_arg ?? null,
-        sg_app: sg.sg_app ?? null,
-        sg_ott: sg.sg_ott ?? null,
-        sg_t2g: (sg.sg_app!=null&&sg.sg_arg!=null&&sg.sg_ott!=null) ? parseFloat((sg.sg_app+sg.sg_arg+sg.sg_ott).toFixed(3)) : null,
-        sg_total: sg.sg_total ?? null,
-        driving_distance: sg.driving_dist ?? null,
-        driving_accuracy: sg.driving_acc ?? null,
-        dk_win, dk_top10, dk_mc,
-        dk_frl: (() => { const b = betFRLMap[p.dg_id]||{}; return b.draftkings ? parseInt(String(b.draftkings).replace('+','')) : null; })(),
-        fanduel_frl: (betFRLMap[p.dg_id]||{}).fanduel || null,
-        caesars_frl: (betFRLMap[p.dg_id]||{}).caesars || null,
-        datagolf_frl: (betFRLMap[p.dg_id]||{}).datagolf?.baseline || null,
-        fanduel_win: bWin.fanduel || null,
-        caesars_win: bWin.caesars || null,
-        betmgm_win: bWin.betmgm || null,
-        pinnacle_win: bWin.pinnacle || null,
-        datagolf_baseline: bWin.datagolf?.baseline || null,
-        book_implied: bookImplied,
-        edge_vs_book: edge,
-        reasons: reasons.slice(0,4)
+        sg_putt: s.sg_putt ?? null, sg_arg, sg_app, sg_ott,
+        sg_t2g: (sg_app !== null && sg_arg !== null && sg_ott !== null) ? parseFloat((sg_app + sg_arg + sg_ott).toFixed(3)) : null,
+        sg_total: s.sg_total ?? null,
+        driving_distance: s.driving_dist ?? null,
+        driving_accuracy: s.driving_acc ?? null,
+        dk_win, dk_top10, dk_mc, dk_frl,
+        fanduel_win: bw.fanduel || null, caesars_win: bw.caesars || null,
+        betmgm_win: bw.betmgm || null, pinnacle_win: bw.pinnacle || null,
+        datagolf_baseline: (bw.datagolf || {}).baseline || null,
+        fanduel_frl: bf.fanduel || null, caesars_frl: bf.caesars || null,
+        datagolf_frl: (bf.datagolf || {}).baseline || null,
+        book_implied: bookImp, edge_vs_book: edge,
+        reasons: reasons.slice(0, 4)
       };
-    });
+    }).filter(Boolean);
 
-    players.sort((a,b) => b.win - a.win);
+    players.sort((a, b) => b.win - a.win);
 
-    // Event location — map common tournaments, fallback to Harbour Town for RBC
     const LOCATIONS = {
-      'Masters Tournament':     { lat: 33.5031, lon: -82.0219, name: 'Augusta, GA' },
-      'RBC Heritage':           { lat: 32.1416, lon: -80.8392, name: 'Hilton Head Island, SC' },
-      'Truist Championship':    { lat: 33.0282, lon: -84.5773, name: 'Peachtree City, GA' },
-      'PGA Championship':       { lat: 35.1495, lon: -80.8439, name: 'Charlotte, NC' },
-      'U.S. Open':              { lat: 40.6259, lon: -74.0594, name: 'Shinnecock Hills, NY' },
-      'The Open Championship':  { lat: 55.3781, lon: -3.4360,  name: 'Scotland, UK' },
+      'Masters Tournament':       { lat: 33.5031, lon: -82.0219, name: 'Augusta, GA' },
+      'RBC Heritage':             { lat: 32.1416, lon: -80.8392, name: 'Hilton Head Island, SC' },
+      'Truist Championship':      { lat: 33.0282, lon: -84.5773, name: 'Peachtree City, GA' },
+      'PGA Championship':         { lat: 35.1495, lon: -80.8439, name: 'Charlotte, NC' },
+      'U.S. Open':                { lat: 40.6259, lon: -74.0594, name: 'Shinnecock Hills, NY' },
+      'The Open Championship':    { lat: 55.3781, lon: -3.4360,  name: 'Scotland, UK' },
       'The Players Championship': { lat: 30.1975, lon: -81.3964, name: 'Ponte Vedra Beach, FL' },
-      'Memorial Tournament':    { lat: 40.0992, lon: -83.1521, name: 'Dublin, OH' },
+      'Memorial Tournament':      { lat: 40.0992, lon: -83.1521, name: 'Dublin, OH' },
     };
-    const eventLocation = LOCATIONS[preds.event_name] || { lat: 33.5031, lon: -82.0219, name: 'Tournament Location' };
 
     res.status(200).json({
-      event_name: preds.event_name,
-      last_updated: preds.last_updated,
+      event_name: preds.event_name || 'Current Tournament',
+      last_updated: preds.last_updated || '',
       course_name: decomp.course_name || '',
-      event_location: eventLocation,
+      event_location: LOCATIONS[preds.event_name] || { lat: 32.1416, lon: -80.8392, name: 'Tournament Location' },
       players,
-      matchups: matchups.matchups || []
+      matchups: sa(mu.matchups)
     });
 
-  } catch(e) {
+  } catch (e) {
     res.status(500).json({ error: e.message, stack: e.stack });
   }
 }
