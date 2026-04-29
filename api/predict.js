@@ -1,1373 +1,169 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Snag Bois | One &amp; Done HQ</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<style>
-:root {
-  --green-dark: #0d2818;
-  --green-mid: #1a4a2e;
-  --green-light: #2d6a4f;
-  --green-bright: #52b788;
-  --gold: #d4a017;
-  --gold-light: #f0c040;
-  --cream: #faf7f0;
-  --cream-dark: #f0ebe0;
-  --text: #1a1a1a;
-  --text-muted: #6b7280;
-  --red: #dc2626;
-  --red-light: #fee2e2;
-  --amber: #d97706;
-  --amber-light: #fef3c7;
-  --blue: #1d4ed8;
-  --blue-light: #dbeafe;
-  --white: #ffffff;
-  --shadow: 0 4px 24px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
-  --radius: 12px;
-  --radius-sm: 8px;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
-/* HEADER */
-.site-header{background:var(--green-dark);color:white;padding:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.3);}
-.header-inner{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px;}
-.brand{display:flex;align-items:center;gap:12px;}
-.brand-logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--gold);letter-spacing:-0.5px;}
-.brand-sub{font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;margin-top:1px;}
-.header-info{text-align:right;}
-.header-event{font-size:13px;font-weight:600;color:var(--gold-light);}
-.header-updated{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;}
-/* GRASS TEXTURE HERO */
-.hero{background:linear-gradient(135deg,var(--green-dark) 0%,var(--green-mid) 60%,var(--green-light) 100%);padding:2.5rem 2rem;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.02) 0px,rgba(255,255,255,0.02) 1px,transparent 1px,transparent 8px);pointer-events:none;}
-.hero-grid{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem;}
-.stat-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:1rem 1.25rem;backdrop-filter:blur(4px);}
-.stat-card .s-label{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;}
-.stat-card .s-value{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:white;line-height:1;}
-.stat-card .s-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:4px;}
-/* TOP PICK BANNER */
-.pick-banner{background:linear-gradient(135deg,var(--gold) 0%,#b8860b 100%);color:white;padding:1.5rem 2rem;border-bottom:4px solid rgba(0,0,0,0.1);}
-.pick-banner-inner{max-width:1500px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:2rem;}
-.pick-label{font-size:10px;text-transform:uppercase;letter-spacing:0.15em;opacity:0.75;margin-bottom:4px;}
-.pick-name{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;line-height:1;}
-.pick-detail{font-size:13px;opacity:0.85;margin-top:6px;display:flex;gap:16px;flex-wrap:wrap;}
-.pick-detail span{display:flex;align-items:center;gap:4px;}
-.pick-reason{background:rgba(0,0,0,0.15);border-radius:var(--radius);padding:0.75rem 1rem;font-size:12px;max-width:400px;line-height:1.6;}
-.pick-reason strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;opacity:0.7;margin-bottom:4px;}
-/* MAIN LAYOUT */
-.main{max-width:1500px;margin:0 auto;padding:1.5rem 2rem;}
-/* TABS */
-.tab-bar{display:flex;gap:4px;margin-bottom:1.5rem;background:var(--cream-dark);padding:4px;border-radius:var(--radius);width:fit-content;flex-wrap:wrap;}
-.tab-btn{font-size:12px;font-weight:500;padding:7px 16px;border-radius:var(--radius-sm);border:none;background:transparent;cursor:pointer;color:var(--text-muted);transition:all 0.15s;}
-.tab-btn.active{background:white;color:var(--green-dark);box-shadow:0 1px 4px rgba(0,0,0,0.1);font-weight:600;}
-/* CARDS */
-.card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem;margin-bottom:1rem;}
-.card-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--green-dark);margin-bottom:4px;}
-.card-sub{font-size:12px;color:var(--text-muted);margin-bottom:1rem;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;}
-/* PICK CARDS */
-.pick-card{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--cream-dark);align-items:flex-start;}
-.pick-card:last-child{border-bottom:none;}
-.pick-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:900;flex-shrink:0;}
-.pick-num.n1{background:var(--gold);color:white;}
-.pick-num.n2{background:#9ca3af;color:white;}
-.pick-num.n3{background:#b45309;color:white;}
-.pick-num.nr{background:var(--green-light);color:white;}
-.pick-body{flex:1;}
-.pick-pname{font-size:14px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.pick-stats{font-size:11px;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
-.pick-reasons{display:flex;flex-wrap:wrap;gap:4px;}
-.reason-tag{font-size:10px;padding:2px 8px;border-radius:999px;background:var(--blue-light);color:var(--blue);font-weight:500;}
-.pick-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;}
-.rec-pill{font-size:11px;font-weight:600;padding:4px 12px;border-radius:999px;white-space:nowrap;}
-.rec-strong{background:#dcfce7;color:#15803d;}
-.rec-good{background:var(--blue-light);color:var(--blue);}
-.rec-consider{background:var(--amber-light);color:var(--amber);}
-.rec-used{background:var(--red-light);color:var(--red);}
-/* BADGE */
-.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:600;}
-.badge-green{background:#dcfce7;color:#15803d;}
-.badge-blue{background:var(--blue-light);color:var(--blue);}
-.badge-amber{background:var(--amber-light);color:var(--amber);}
-.badge-red{background:var(--red-light);color:var(--red);}
-.badge-gray{background:#f3f4f6;color:#6b7280;}
-.badge-gold{background:#fef9c3;color:#854d0e;}
-/* TABLE */
-.table-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
-.table-toolbar select{font-size:12px;padding:6px 10px;border:1px solid #e5e7eb;border-radius:var(--radius-sm);background:white;color:var(--text);}
-.table-toolbar button{font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--green-light);background:var(--green-dark);color:white;cursor:pointer;font-weight:500;}
-.table-toolbar button:hover{background:var(--green-mid);}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-th{text-align:left;font-size:10px;color:var(--text-muted);font-weight:600;padding:8px 10px;border-bottom:2px solid var(--cream-dark);white-space:nowrap;cursor:pointer;letter-spacing:0.04em;text-transform:uppercase;user-select:none;position:relative;}
-th:hover{color:var(--green-dark);}
-th .sort-arr{font-size:9px;margin-left:3px;color:var(--gold);}
-td{padding:9px 10px;border-bottom:1px solid var(--cream-dark);vertical-align:middle;}
-tr:hover td{background:#fafaf8;}
-tr.used-row td{opacity:0.3;}
-tr.top3-row td{background:#f0fdf4;}
-/* SG BARS */
-.sg-bar-wrap{display:flex;align-items:center;gap:6px;}
-.sg-bar{height:5px;border-radius:3px;width:48px;overflow:hidden;background:#e5e7eb;}
-.sg-fill-pos{height:100%;border-radius:3px;background:linear-gradient(90deg,#22c55e,#15803d);}
-.sg-fill-neg{height:100%;border-radius:3px;background:linear-gradient(90deg,#ef4444,#dc2626);}
-.sg-val{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;}
-.sg-val.pos{color:#15803d;}
-.sg-val.neg{color:var(--red);}
-/* DNA bar */
-.dna-wrap{display:flex;align-items:center;gap:6px;}
-.dna-bar{height:6px;border-radius:3px;width:52px;overflow:hidden;background:#e5e7eb;}
-.dna-fill-pos{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green-bright),var(--green-light));}
-.dna-fill-neg{height:100%;border-radius:3px;background:linear-gradient(90deg,#f87171,var(--red));}
-/* OWGR badge */
-.owgr-badge{font-family:'DM Mono',monospace;font-size:10px;background:var(--green-dark);color:var(--gold);padding:2px 6px;border-radius:4px;font-weight:500;}
-/* BETTING */
-.bet-table{width:100%;border-collapse:collapse;font-size:12px;}
-.bet-table th{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);padding:6px 8px;border-bottom:2px solid var(--cream-dark);text-align:left;}
-.bet-table td{padding:8px 8px;border-bottom:1px solid var(--cream-dark);vertical-align:middle;}
-.bet-table tr:hover td{background:#fafaf8;}
-.odds-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;}
-.odds-pos{color:#15803d;}
-.odds-neg{color:var(--red);}
-.ev-pos{background:#dcfce7;color:#15803d;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700;}
-.ev-neg{background:#f3f4f6;color:#9ca3af;font-size:10px;padding:2px 7px;border-radius:999px;}
-.ev-strong{background:var(--gold);color:white;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700;}
-/* WEATHER */
-.weather-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;}
-.weather-day{background:var(--cream-dark);border-radius:var(--radius-sm);padding:10px;text-align:center;}
-.weather-day .wd-day{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;}
-.weather-day .wd-icon{font-size:1.8rem;margin:6px 0;}
-.weather-day .wd-temp{font-size:14px;font-weight:600;}
-.weather-day .wd-wind{font-size:10px;color:var(--text-muted);margin-top:2px;}
-/* WINNERS */
-.winners-list{display:flex;flex-direction:column;gap:8px;}
-.winner-row{display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--cream-dark);border-radius:var(--radius-sm);}
-.winner-year{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text-muted);min-width:36px;}
-.winner-name{font-size:13px;font-weight:600;flex:1;}
-.winner-score{font-family:'DM Mono',monospace;font-size:12px;color:var(--green-light);font-weight:500;}
-.winner-margin{font-size:11px;color:var(--text-muted);}
-.in-field-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--green-light);color:white;font-weight:600;}
-/* TOOLTIP */
-.tooltip-wrap{position:relative;display:inline-flex;align-items:center;gap:3px;cursor:help;}
-.tooltip-icon{width:13px;height:13px;border-radius:50%;background:#d1d5db;color:#6b7280;font-size:9px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
-.tooltip-box{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--green-dark);color:white;font-size:11px;padding:8px 12px;border-radius:var(--radius-sm);width:220px;line-height:1.5;z-index:999;pointer-events:none;opacity:0;transition:opacity 0.15s;white-space:normal;text-align:left;font-weight:400;box-shadow:var(--shadow-lg);}
-.tooltip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--green-dark);}
-.tooltip-wrap:hover .tooltip-box{opacity:1;}
-/* USED CHIPS */
-.used-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;min-height:32px;}
-.used-chip{background:var(--red-light);border:1px solid #fca5a5;border-radius:var(--radius-sm);padding:4px 10px;font-size:12px;color:var(--red);display:flex;align-items:center;gap:6px;font-weight:500;}
-.used-chip button{background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;line-height:1;padding:0;}
-.used-search{width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:var(--radius-sm);font-size:13px;margin-bottom:10px;font-family:'DM Sans',sans-serif;}
-.used-list{display:flex;flex-direction:column;gap:4px;max-height:420px;overflow-y:auto;}
-.used-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid #e5e7eb;font-size:13px;}
-.used-item.is-used{background:var(--red-light);border-color:#fca5a5;}
-.used-item button{font-size:11px;padding:3px 10px;border-radius:5px;border:none;cursor:pointer;font-weight:600;}
-.btn-mark{background:var(--red);color:white;}
-.btn-unmark{background:#e5e7eb;color:#374151;}
-/* COLUMN PICKER MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;}
-.modal{background:white;border-radius:var(--radius);padding:1.5rem;width:580px;max-width:100%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
-.modal h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--green-dark);margin-bottom:4px;}
-.modal-sub{font-size:12px;color:var(--text-muted);margin-bottom:16px;}
-.col-group{margin-bottom:14px;}
-.col-group-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:8px;}
-.col-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.col-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #e5e7eb;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;}
-.col-item:hover{background:var(--cream);}
-.col-item input{accent-color:var(--green-light);cursor:pointer;}
-.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--cream-dark);}
-.modal-footer button{font-size:12px;padding:7px 16px;border-radius:var(--radius-sm);cursor:pointer;font-weight:500;}
-.btn-reset{border:1px solid #e5e7eb;background:white;color:var(--text);}
-.btn-done{border:1px solid var(--green-light);background:var(--green-dark);color:white;}
-/* MATCHUP */
-.matchup-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--cream-dark);gap:10px;font-size:12px;}
-.matchup-row:last-child{border-bottom:none;}
-.m-player{flex:1;font-weight:500;}
-.m-vs{color:var(--text-muted);font-size:10px;font-weight:600;text-transform:uppercase;}
-.m-odds{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;}
-/* LOADING */
-.loading-state{text-align:center;padding:5rem 2rem;color:var(--text-muted);}
-.spinner{width:36px;height:36px;border:3px solid var(--cream-dark);border-top-color:var(--green-bright);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.error-state{background:var(--red-light);border:1px solid #fca5a5;border-radius:var(--radius);padding:1rem 1.25rem;color:var(--red);margin:2rem;}
-/* RESPONSIVE */
-@media(max-width:900px){
-  .hero-grid{grid-template-columns:1fr 1fr;}
-  .grid2,.grid3{grid-template-columns:1fr;}
-  .main{padding:1rem;}
-  .pick-banner-inner{flex-direction:column;gap:1rem;}
-  .col-grid{grid-template-columns:1fr;}
-}
-/* MARK USED BTN */
-.mark-btn{font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid #e5e7eb;background:white;cursor:pointer;color:var(--red);font-weight:600;white-space:nowrap;}
-.mark-btn.unmark{color:#15803d;}
-/* COLOR CODED CELLS */
-.cell-great{color:#15803d;font-weight:600;}
-.cell-good{color:#16a34a;}
-.cell-neutral{color:var(--text-muted);}
-.cell-poor{color:var(--amber);}
-.cell-bad{color:var(--red);}
-</style>
-</head>
-<body>
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-<header class="site-header">
-  <div class="header-inner">
-    <div class="brand">
-      <div>
-        <div class="brand-logo">⛳ Snag Bois</div>
-        <div class="brand-sub">One &amp; Done HQ</div>
-      </div>
-    </div>
-    <div class="header-info">
-      <div class="header-event" id="hEvent">Loading...</div>
-      <div class="header-updated" id="hUpdated">—</div>
-    </div>
-  </div>
-</header>
+  const key = process.env.DATAGOLF_API_KEY;
+  if (!key) return res.status(500).json({ error: 'API key not configured' });
 
-<div id="loadingState" class="loading-state">
-  <div class="spinner"></div>
-  <div>Fetching live data from DataGolf...</div>
-</div>
-<div id="errorState" class="error-state" style="display:none;"></div>
+  const sf = async (url) => {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) return {};
+      const text = await r.text();
+      try { return JSON.parse(text); } catch(e) { return {}; }
+    } catch(e) { return {}; }
+  };
 
-<div id="appContent" style="display:none;">
+  const sa = (v) => Array.isArray(v) ? v : [];
 
-  <!-- HERO STATS -->
-  <div class="hero">
-    <div class="hero-grid">
-      <div class="stat-card">
-        <div class="s-label">Tournament</div>
-        <div class="s-value" id="hTournament" style="font-size:1.1rem;padding-top:4px;">—</div>
-        <div class="s-sub" id="hCourse">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-label">Field size</div>
-        <div class="s-value" id="hField">—</div>
-        <div class="s-sub">players competing</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-label">Players used</div>
-        <div class="s-value" id="hUsed">0</div>
-        <div class="s-sub">locked this season</div>
-      </div>
-      <div class="stat-card">
-        <div class="s-label">Weather</div>
-        <div class="s-value" id="hWeather" style="font-size:1.1rem;padding-top:4px;">—</div>
-        <div class="s-sub" id="hWeatherSub">loading...</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOP PICK BANNER -->
-  <div class="pick-banner">
-    <div class="pick-banner-inner">
-      <div>
-        <div class="pick-label">This week's Snag Bois pick</div>
-        <div class="pick-name" id="bPickName">—</div>
-        <div class="pick-detail" id="bPickDetail">—</div>
-      </div>
-      <div class="pick-reason" id="bPickReason">
-        <strong>Why this pick?</strong>
-        Loading analysis...
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN CONTENT -->
-  <div class="main">
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="showTab('picks')">🏆 My Picks</button>
-      <button class="tab-btn" onclick="showTab('field')">📊 Full Field</button>
-      <button class="tab-btn" onclick="showTab('betting')">💰 Betting</button>
-      <button class="tab-btn" onclick="showTab('weather')">🌤 Weather</button>
-      <button class="tab-btn" onclick="showTab('frl')">🚀 FRL Picks</button>
-      <button class="tab-btn" onclick="showTab('parlay')">🎰 Parlay Builder</button>
-      <button class="tab-btn" onclick="showTab('history')">📜 Past Winners</button>
-      <button class="tab-btn" onclick="showTab('used')">✅ Manage Picks</button>
-    </div>
-
-    <!-- MY PICKS TAB -->
-    <div id="tab-picks">
-      <div class="grid2">
-        <div class="card">
-          <div class="card-title">Top available picks</div>
-          <div class="card-sub">Ranked by win probability + DNA course fit. Used players excluded.</div>
-          <div id="picksList"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Pick reasoning</div>
-          <div class="card-sub">Data-driven analysis for each top pick</div>
-          <div id="reasoningList"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FULL FIELD TAB -->
-    <div id="tab-field" style="display:none;">
-      <div class="card">
-        <div class="table-toolbar">
-          <select id="fFilter" onchange="renderTable()">
-            <option value="all">All players</option>
-            <option value="avail">Available only</option>
-            <option value="top25">Top 25 only</option>
-          </select>
-          <button onclick="openColPicker()">⚙ Columns</button>
-        </div>
-        <div style="overflow-x:auto;">
-          <table><thead id="tHead"></thead><tbody id="tBody"></tbody></table>
-        </div>
-      </div>
-    </div>
-
-    <!-- BETTING TAB -->
-    <div id="tab-betting" style="display:none;">
-      <div class="grid2">
-        <div class="card">
-          <div class="card-title">Win market — best value</div>
-          <div class="card-sub">Model probability vs DraftKings implied odds. +EV = model edge.</div>
-          <table class="bet-table">
-            <thead><tr><th>Player</th><th>Model %</th><th>DK Odds</th><th>FD Odds</th><th>Caesars</th><th>Edge</th></tr></thead>
-            <tbody id="betWinBody"></tbody>
-          </table>
-        </div>
-        <div class="card">
-          <div class="card-title">Top 10 market value</div>
-          <div class="card-sub">Model top-10 probability vs book implied odds</div>
-          <table class="bet-table">
-            <thead><tr><th>Player</th><th>Model %</th><th>DK Odds</th><th>Edge</th></tr></thead>
-            <tbody id="betT10Body"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="grid2">
-        <div class="card">
-          <div class="card-title">Make cut value</div>
-          <div class="card-sub">Best make cut bets vs DraftKings</div>
-          <table class="bet-table">
-            <thead><tr><th>Player</th><th>Model %</th><th>DK Odds</th><th>Edge</th></tr></thead>
-            <tbody id="betMCBody"></tbody>
-          </table>
-        </div>
-        <div class="card">
-          <div class="card-title">Tournament matchups</div>
-          <div class="card-sub">Head-to-head model edges</div>
-          <div id="matchupsList"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Multi-book win odds comparison</div>
-        <div class="card-sub">Top 15 players — best odds across sportsbooks highlighted in green</div>
-        <div style="overflow-x:auto;">
-          <table class="bet-table">
-            <thead><tr><th>Player</th><th>OWGR</th><th>Model</th><th>DraftKings</th><th>FanDuel</th><th>Caesars</th><th>BetMGM</th><th>Pinnacle</th><th>DG Model</th></tr></thead>
-            <tbody id="betCompBody"></tbody>
-          </table>
-        </div>
-        <p style="font-size:10px;color:var(--text-muted);margin-top:10px;">Bet responsibly. Model odds derived from DataGolf probability estimates.</p>
-      </div>
-    </div>
-
-    <!-- WEATHER TAB -->
-    <div id="tab-weather" style="display:none;">
-      <div class="grid2">
-        <div class="card">
-          <div class="card-title">Tournament week forecast</div>
-          <div class="card-sub" id="weatherLocation">Loading location...</div>
-          <div class="weather-grid" id="weatherGrid"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Weather impact on picks</div>
-          <div class="card-sub">How conditions affect player selection</div>
-          <div id="weatherInsights"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAST WINNERS TAB -->
-    <div id="tab-history" style="display:none;">
-      <div class="grid2">
-        <div class="card">
-          <div class="card-title">Recent champions</div>
-          <div class="card-sub">Past 10 years — players still in this week's field highlighted</div>
-          <div class="winners-list" id="winnersList"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Champion profile</div>
-          <div class="card-sub">What it takes to win this tournament based on past winners</div>
-          <div id="champProfile"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FRL TAB -->
-    <div id="tab-frl" style="display:none;">
-      <div class="grid2">
-        <div class="card">
-          <div class="card-title">First Round Leader picks</div>
-          <div class="card-sub">Data-driven FRL analysis — model probability, historical correlations, and reasoning</div>
-          <div id="frlList"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">FRL betting odds</div>
-          <div class="card-sub">Multi-book FRL odds with model edge highlighted</div>
-          <table class="bet-table">
-            <thead><tr><th>Player</th><th>Model Win%</th><th>SG: OTT</th><th>DK Odds</th><th>FD Odds</th><th>Caesars</th><th>DG Model</th></tr></thead>
-            <tbody id="frlOddsBody"></tbody>
-          </table>
-          <p style="font-size:10px;color:var(--text-muted);margin-top:10px;">FRL highly correlated with driving distance, OTT strokes gained, and low scoring average on day 1. Bet responsibly.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- PARLAY TAB -->
-    <div id="tab-parlay" style="display:none;">
-      <div class="card">
-        <div class="card-title">Recommended parlay — +400 to +1000 range</div>
-        <div class="card-sub">Model-generated parlay combining best value bets across markets. Legs selected for positive EV and correlation.</div>
-        <div id="parlayContent"></div>
-      </div>
-      <div class="card" style="margin-top:1rem;">
-        <div class="card-title">Build your own parlay</div>
-        <div class="card-sub">Select legs manually — parlay odds calculated automatically</div>
-        <div id="parlayBuilder"></div>
-        <div id="parlayCalc" style="margin-top:1rem;padding:1rem;background:var(--cream-dark);border-radius:var(--radius-sm);display:none;">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">Your parlay</div>
-          <div id="parlayLegs" style="margin-bottom:12px;"></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--green-dark);" id="parlayOdds">—</div>
-            <button onclick="clearParlay()" style="font-size:12px;padding:5px 12px;border-radius:var(--radius-sm);border:1px solid #fca5a5;background:var(--red-light);color:var(--red);cursor:pointer;">Clear parlay</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MANAGE PICKS TAB -->
-    <div id="tab-used" style="display:none;">
-      <div class="card">
-        <div class="card-title">Manage used players</div>
-        <div class="card-sub">Mark players as used — they'll be excluded from picks and greyed out in the field</div>
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-          <button onclick="clearAllUsed()" style="font-size:12px;padding:6px 14px;border-radius:var(--radius-sm);border:1px solid #fca5a5;background:var(--red-light);color:var(--red);cursor:pointer;font-weight:600;">✕ Clear all</button>
-          <span style="font-size:13px;color:var(--text-muted);align-self:center;"><span id="usedCount">0</span> players used this season</span>
-        </div>
-        <div class="used-chips" id="usedChips"></div>
-        <input type="text" class="used-search" placeholder="Search players..." id="usedSearch" oninput="renderUsedMgr()">
-        <div class="used-list" id="usedList"></div>
-      </div>
-    </div>
-
-  </div><!-- /main -->
-</div><!-- /appContent -->
-
-<!-- COLUMN PICKER MODAL -->
-<div class="modal-overlay" id="colModal" style="display:none;" onclick="if(event.target===this)closeColModal()">
-  <div class="modal">
-    <h3>Customize columns</h3>
-    <div class="modal-sub">Toggle columns on or off in the Full Field view</div>
-    <div id="colGroups"></div>
-    <div class="modal-footer">
-      <button class="btn-reset" onclick="resetCols()">Reset defaults</button>
-      <button class="btn-done" onclick="closeColModal()">Done</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── TOOLTIP HELPER ───────────────────────────────────────────────
-const TIPS = {
-  win: 'Win probability from DataGolf\'s model. Combines player skill, course fit, and current form. Higher = better chance to win outright.',
-  top_5: 'Probability of finishing in the top 5. Good for DFS captain slots.',
-  top_10: 'Probability of finishing in the top 10. Most common bet market.',
-  top_20: 'Probability of finishing top 20. Lower risk bet with decent payout.',
-  make_cut: 'Probability of making the cut and playing the weekend. Avoid players below 60%.',
-  owgr: 'Official World Golf Ranking. Lower number = better ranked player globally.',
-  fit: 'Course fit adjustment in strokes gained. Measures how well this player\'s game suits the course demands. Positive = good fit.',
-  history: 'Historical performance adjustment at this specific course. Based on past results at this venue. Positive = has played well here before.',
-  approach: 'Approach shot fit for this course. How well the player\'s iron play matches what this course rewards.',
-  shortgame: 'Short game fit. How well the player\'s chipping and scrambling matches this course\'s demands.',
-  dna: 'DNA Match Score — weighted composite of all course fit metrics (35% fit + 30% history + 20% approach + 15% short game). Above 0.1 = good, above 0.3 = excellent.',
-  sg_putt: 'Strokes Gained: Putting. How many strokes per round the player gains/loses on the greens vs field average. Above +0.3 is elite.',
-  sg_arg: 'Strokes Gained: Around the Green. Chipping, pitching, bunker play within 30 yards. Above +0.2 is strong.',
-  sg_app: 'Strokes Gained: Approach. Iron play from >30 yards. Above +0.5 is elite. Critical stat at Augusta.',
-  sg_ott: 'Strokes Gained: Off the Tee. Driving performance. Above +0.5 is elite.',
-  sg_t2g: 'Strokes Gained: Tee to Green (calculated). Sum of OTT + Approach + ARG. Overall ball-striking metric.',
-  sg_total: 'Strokes Gained: Total. Overall performance vs field average. Elite players are typically above +1.5.',
-  edge: 'Model edge vs DraftKings implied probability. Positive = model thinks player is underpriced. Above +2% is meaningful value.',
-};
-function tipHtml(key, label) {
-  const tip = TIPS[key] || '';
-  return `<span class="tooltip-wrap">${label}${tip ? `<span class="tooltip-icon">?</span><span class="tooltip-box">${tip}</span>` : ''}</span>`;
-}
-
-// ── COLUMN DEFINITIONS ───────────────────────────────────────────
-const ALL_COLS = [
-  {key:'rank',label:'Rank',group:'Core',default:true,fmt:v=>v,noSort:false},
-  {key:'name',label:'Player',group:'Core',default:true,fmt:v=>v},
-  {key:'owgr',label:'OWGR',group:'Core',default:true,fmt:v=>v?`#${v}`:'—'},
-  {key:'win',label:'Win %',group:'Predictions',default:true,tip:true,fmt:(v,p)=>colorPct(v,[1,3,6,10])},
-  {key:'top5',label:'Top 5 %',group:'Predictions',default:false,tip:true,fmt:(v,p)=>colorPct(v,[5,12,20,30])},
-  {key:'top10',label:'Top 10 %',group:'Predictions',default:true,tip:true,fmt:(v,p)=>colorPct(v,[10,20,30,40])},
-  {key:'top20',label:'Top 20 %',group:'Predictions',default:false,tip:true,fmt:(v,p)=>colorPct(v,[15,25,35,45])},
-  {key:'make_cut',label:'Make Cut %',group:'Predictions',default:true,tip:true,fmt:(v,p)=>colorPct(v,[50,60,70,80])},
-  {key:'fit',label:'Course Fit',group:'Course Fit',default:true,tip:true,fmt:(v,p)=>sgCell(v,0.05,0.15)},
-  {key:'history',label:'Course History',group:'Course Fit',default:true,tip:true,fmt:(v,p)=>sgCell(v,0.05,0.15)},
-  {key:'approach',label:'Approach Fit',group:'Course Fit',default:false,tip:true,fmt:(v,p)=>sgCell(v,0.003,0.008)},
-  {key:'shortgame',label:'Short Game Fit',group:'Course Fit',default:false,tip:true,fmt:(v,p)=>sgCell(v,0.02,0.06)},
-  {key:'dna',label:'DNA Score',group:'Course Fit',default:true,tip:true,special:'dna'},
-  {key:'sg_putt',label:'SG: Putt',group:'Strokes Gained',default:true,tip:true,fmt:(v,p)=>sgBar(v,0.3,0.6)},
-  {key:'sg_arg',label:'SG: Around Green',group:'Strokes Gained',default:false,tip:true,fmt:(v,p)=>sgBar(v,0.15,0.35)},
-  {key:'sg_app',label:'SG: Approach',group:'Strokes Gained',default:true,tip:true,fmt:(v,p)=>sgBar(v,0.4,0.7)},
-  {key:'sg_ott',label:'SG: Off Tee',group:'Strokes Gained',default:false,tip:true,fmt:(v,p)=>sgBar(v,0.4,0.7)},
-  {key:'sg_t2g',label:'SG: Tee to Green',group:'Strokes Gained',default:false,tip:true,fmt:(v,p)=>sgBar(v,0.8,1.5)},
-  {key:'sg_total',label:'SG: Total',group:'Strokes Gained',default:true,tip:true,fmt:(v,p)=>sgBar(v,1.0,2.0)},
-  {key:'age',label:'Age',group:'Player Info',default:false,fmt:v=>v??'—'},
-  {key:'country',label:'Country',group:'Player Info',default:false,fmt:v=>v||'—'},
-  {key:'status',label:'Status',group:'Core',default:true,special:'status',noSort:true},
-];
-
-// ── COLOR HELPERS ────────────────────────────────────────────────
-function colorPct(v, [poor,ok,good,great]) {
-  const pct = typeof v === 'number' ? v : 0;
-  const str = pct.toFixed(1) + '%';
-  if (pct >= great) return `<span class="cell-great">${str}</span>`;
-  if (pct >= good) return `<span class="cell-good">${str}</span>`;
-  if (pct >= ok) return `<span class="cell-neutral">${str}</span>`;
-  if (pct >= poor) return `<span class="cell-poor">${str}</span>`;
-  return `<span class="cell-bad">${str}</span>`;
-}
-function sgCell(v, ok, great) {
-  if (v == null) return '<span class="cell-neutral">—</span>';
-  const str = v >= 0 ? `+${v.toFixed(3)}` : v.toFixed(3);
-  if (v >= great) return `<span class="cell-great">${str}</span>`;
-  if (v >= ok) return `<span class="cell-good">${str}</span>`;
-  if (v >= -ok) return `<span class="cell-neutral">${str}</span>`;
-  if (v >= -great) return `<span class="cell-poor">${str}</span>`;
-  return `<span class="cell-bad">${str}</span>`;
-}
-function sgBar(v, ok, great) {
-  if (v == null) return '<span class="cell-neutral">—</span>';
-  const abs = Math.abs(v), max = Math.max(great * 1.5, abs);
-  const pct = Math.min(abs / max * 100, 100).toFixed(0);
-  const isPos = v >= 0;
-  const cls = v >= great ? 'cell-great' : v >= ok ? 'cell-good' : v >= -ok ? 'cell-neutral' : v >= -great ? 'cell-poor' : 'cell-bad';
-  const fillCls = isPos ? 'sg-fill-pos' : 'sg-fill-neg';
-  const sign = v >= 0 ? '+' : '';
-  return `<div class="sg-bar-wrap"><div class="sg-bar"><div class="${fillCls}" style="width:${pct}%"></div></div><span class="sg-val ${cls}">${sign}${v.toFixed(2)}</span></div>`;
-}
-function dnaBar(v) {
-  const max = 0.4, abs = Math.abs(v||0);
-  const pct = Math.min(abs / max * 100, 100).toFixed(0);
-  const isPos = (v||0) >= 0;
-  const fillCls = isPos ? 'dna-fill-pos' : 'dna-fill-neg';
-  const lbl = v >= 0.3 ? {l:'Excellent',c:'badge-green'} : v >= 0.1 ? {l:'Good',c:'badge-blue'} : v >= -0.1 ? {l:'Neutral',c:'badge-gray'} : {l:'Poor fit',c:'badge-red'};
-  return `<div class="dna-wrap"><div class="dna-bar"><div class="${fillCls}" style="width:${pct}%"></div></div><span style="font-family:'DM Mono',monospace;font-size:11px;">${(v||0).toFixed(3)}</span> <span class="badge ${lbl.c}">${lbl.l}</span></div>`;
-}
-function oddsCell(v) {
-  if (!v) return '<span class="cell-neutral">—</span>';
-  const n = typeof v === 'string' ? v : (v > 0 ? '+'+v : v);
-  const isPos = String(n).startsWith('+');
-  return `<span class="odds-val ${isPos?'odds-pos':'odds-neg'}">${n}</span>`;
-}
-
-// ── STATE ────────────────────────────────────────────────────────
-let allPlayers = [], usedPlayers = new Set(), activeCols = new Set(), currentSort = {col:'win',dir:'desc'};
-let weatherData = null, eventLocation = null;
-
-function initState() {
-  try { usedPlayers = new Set(JSON.parse(localStorage.getItem('sb_used')||'[]')); } catch(e){}
   try {
-    const saved = JSON.parse(localStorage.getItem('sb_cols')||'null');
-    activeCols = new Set(saved || ALL_COLS.filter(c=>c.default).map(c=>c.key));
-  } catch(e) { activeCols = new Set(ALL_COLS.filter(c=>c.default).map(c=>c.key)); }
-}
-function saveUsed() { localStorage.setItem('sb_used', JSON.stringify([...usedPlayers])); }
-function saveCols() { localStorage.setItem('sb_cols', JSON.stringify([...activeCols])); }
+    const [preds, decomp, betWin, sg, rankings, betT10, betMC, betFRL, mu] = await Promise.all([
+      sf(`https://feeds.datagolf.com/preds/pre-tournament?tour=pga&dead_heat=no&odds_format=percent&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/preds/player-decompositions?tour=pga&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=win&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/preds/skill-ratings?display=value&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/preds/get-dg-rankings?file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=make_cut&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=frl&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`)
+    ]);
 
-function isUsed(name) { return usedPlayers.has(name); }
-function toggleUsed(name) {
-  if (!name) return;
-  const cleanName = String(name).trim();
-  if (!cleanName) return;
-  if (usedPlayers.has(cleanName)) usedPlayers.delete(cleanName);
-  else usedPlayers.add(cleanName);
-  saveUsed();
-  document.getElementById('hUsed').textContent = usedPlayers.size;
-  renderAll();
-  // Re-render the used manager if it's visible
-  const usedTab = document.getElementById('tab-used');
-  if (usedTab && usedTab.style.display !== 'none') renderUsedMgr();
-}
-function clearAllUsed() {
-  if (!confirm('Clear all used players?')) return;
-  usedPlayers.clear(); saveUsed();
-  document.getElementById('hUsed').textContent = 0;
-  renderAll();
-}
-
-// ── NAME FORMAT ──────────────────────────────────────────────────
-function fmtName(raw) {
-  if (!raw) return '';
-  return raw.includes(',') ? raw.split(',').map(s=>s.trim()).reverse().join(' ') : raw;
-}
-
-// ── TABS ─────────────────────────────────────────────────────────
-function showTab(tab) {
-  document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
-  document.getElementById('tab-' + tab).style.display = 'block';
-  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-    const tabs = ['picks','field','betting','weather','frl','parlay','history','used'];
-    btn.classList.toggle('active', tabs[i] === tab);
-  });
-  if (tab === 'used') renderUsedMgr();
-}
-
-// ── LOAD DATA ────────────────────────────────────────────────────
-async function loadData() {
-  try {
-    const res = await fetch('/api/predict');
-    if (!res.ok) throw new Error('API error ' + res.status);
-    const data = await res.json();
-
-    document.getElementById('hEvent').textContent = data.event_name || 'Current Tournament';
-    document.getElementById('hUpdated').textContent = 'Updated: ' + (data.last_updated || '—');
-    document.getElementById('hTournament').textContent = data.event_name || '—';
-    document.getElementById('hCourse').textContent = data.course_name || '—';
-    document.getElementById('hUsed').textContent = usedPlayers.size;
-
-    eventLocation = data.event_location;
-
-    allPlayers = (data.players || []).map((p, i) => {
-      const name = fmtName(p.player_name);
-      return {
-        name, dg_id: p.dg_id, country: p.country||'', age: p.age,
-        owgr: p.owgr, rank: i+1,
-        win: p.win, top5: p.top_5, top10: p.top_10,
-        top20: p.top_20, make_cut: p.make_cut,
-        fit: p.total_fit_adjustment||0, history: p.course_history_adjustment||0,
-        approach: p.cf_approach_comp||0, shortgame: p.cf_short_comp||0,
-        dna: p.dna||0, final_pred: p.final_pred||0,
-        sg_putt: p.sg_putt, sg_arg: p.sg_arg, sg_app: p.sg_app,
-        sg_ott: p.sg_ott, sg_t2g: p.sg_t2g, sg_total: p.sg_total,
-        driving_distance: p.driving_distance, driving_accuracy: p.driving_accuracy,
-        dk_win: p.dk_win, dk_top5: p.dk_top5, dk_top10: p.dk_top10, dk_mc: p.dk_mc,
-        dk_frl: p.dk_frl, fanduel_frl: p.fanduel_frl, caesars_frl: p.caesars_frl,
-        datagolf_frl: p.datagolf_frl,
-        fanduel_win: p.fanduel_win, caesars_win: p.caesars_win,
-        betmgm_win: p.betmgm_win, pinnacle_win: p.pinnacle_win,
-        datagolf_baseline: p.datagolf_baseline,
-        book_implied: p.book_implied, edge_vs_book: p.edge_vs_book||0,
-        reasons: p.reasons||[], used: isUsed(name)
-      };
-    }).sort((a,b)=>b.win-a.win).map((p,i)=>({...p,rank:i+1}));
-
-    document.getElementById('hField').textContent = allPlayers.length;
-
-    // Load weather
-    if (eventLocation) loadWeather(eventLocation);
-
-    // Load matchups
-    renderMatchups(data.matchups || []);
-
-    renderAll();
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('appContent').style.display = 'block';
-  } catch(e) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'block';
-    document.getElementById('errorState').textContent = 'Could not load data: ' + e.message;
-  }
-}
-
-// ── WEATHER ──────────────────────────────────────────────────────
-async function loadWeather(loc) {
-  try {
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max,weathercode&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto&forecast_days=7`);
-    const w = await r.json();
-    weatherData = w;
-    renderWeather(w, loc);
-    const today = w.daily;
-    if (today) {
-      const temp = Math.round(today.temperature_2m_max[0]);
-      const wind = Math.round(today.windspeed_10m_max[0]);
-      document.getElementById('hWeather').textContent = `${temp}°F · ${wind}mph wind`;
-      document.getElementById('hWeatherSub').textContent = loc.name || 'Tournament location';
+    if (!decomp.players) {
+      return res.status(500).json({ error: 'No player data from DataGolf. Check your API key in Vercel environment variables.' });
     }
-  } catch(e) {
-    document.getElementById('hWeather').textContent = 'Unavailable';
-    document.getElementById('hWeatherSub').textContent = 'Weather data offline';
-  }
-}
 
-function weatherIcon(code) {
-  if (code === 0) return '☀️';
-  if (code <= 2) return '⛅';
-  if (code <= 3) return '☁️';
-  if (code <= 48) return '🌫️';
-  if (code <= 67) return '🌧️';
-  if (code <= 77) return '🌨️';
-  if (code <= 82) return '🌦️';
-  if (code <= 99) return '⛈️';
-  return '🌤️';
-}
+    const predsMap = {};
+    sa(preds.baseline).forEach(p => {
+      if (!p) return;
+      if (p.dg_id) predsMap[p.dg_id] = p;
+      if (p.player_name) predsMap[p.player_name.toLowerCase()] = p;
+    });
 
-function renderWeather(w, loc) {
-  document.getElementById('weatherLocation').textContent = `${loc.name || 'Tournament location'} — 7-day outlook`;
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const d = w.daily;
-  let html = '';
-  const winds = [];
-  for (let i = 0; i < Math.min(7, d.time.length); i++) {
-    const date = new Date(d.time[i]);
-    const day = days[date.getDay()];
-    const hi = Math.round(d.temperature_2m_max[i]);
-    const lo = Math.round(d.temperature_2m_min[i]);
-    const wind = Math.round(d.windspeed_10m_max[i]);
-    const rain = d.precipitation_probability_max[i];
-    const icon = weatherIcon(d.weathercode[i]);
-    winds.push(wind);
-    html += `<div class="weather-day">
-      <div class="wd-day">${day}</div>
-      <div class="wd-icon">${icon}</div>
-      <div class="wd-temp">${hi}° / ${lo}°</div>
-      <div class="wd-wind">💨 ${wind}mph · 🌧️ ${rain}%</div>
-    </div>`;
-  }
-  document.getElementById('weatherGrid').innerHTML = html;
-  const avgWind = winds.reduce((a,b)=>a+b,0)/winds.length;
-  let insight = '';
-  if (avgWind > 20) insight = '<strong>High wind week</strong> — favor accurate ball-strikers over big hitters. Prioritize players with high driving accuracy and strong approach play in wind.';
-  else if (avgWind > 12) insight = '<strong>Moderate wind conditions</strong> — experience and course management will matter. Players with strong course history have an advantage.';
-  else insight = '<strong>Calm conditions expected</strong> — scoring will likely be low. Favor players with elite approach play (SG: Approach) and putting.';
-  const rainDay = d.precipitation_probability_max.findIndex(v=>v>50);
-  if (rainDay >= 0) insight += ` Rain likely on ${days[new Date(d.time[rainDay]).getDay()]} — suspension risk may affect momentum.`;
-  document.getElementById('weatherInsights').innerHTML = `<div style="font-size:13px;line-height:1.7;color:var(--text);">${insight}</div>
-    <div style="margin-top:1rem;padding:1rem;background:var(--cream-dark);border-radius:var(--radius-sm);">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">Wind-adjusted picks</div>
-      ${allPlayers.filter(p=>!p.used).slice(0,4).map(p=>`<div style="font-size:13px;font-weight:500;padding:4px 0;border-bottom:1px solid #e5e7eb;">${p.name} <span class="badge badge-green">Win: ${p.win.toFixed(1)}%</span></div>`).join('')}
-    </div>`;
-}
+    const sgMap = {};
+    sa(sg.players || sg).forEach(p => { if (p && p.dg_id) sgMap[p.dg_id] = p; });
 
-// ── PAST WINNERS ─────────────────────────────────────────────────
-const PAST_WINNERS = {
-  'Masters Tournament': [
-    {year:2025,name:'Rory McIlroy',score:'-11',margin:'Playoff'},
-    {year:2024,name:'Scottie Scheffler',score:'-11',margin:'4 shots'},
-    {year:2023,name:'Jon Rahm',score:'-12',margin:'4 shots'},
-    {year:2022,name:'Scottie Scheffler',score:'-10',margin:'3 shots'},
-    {year:2021,name:'Hideki Matsuyama',score:'-10',margin:'1 shot'},
-    {year:2020,name:'Dustin Johnson',score:'-20',margin:'5 shots'},
-    {year:2019,name:'Tiger Woods',score:'-13',margin:'1 shot'},
-    {year:2018,name:'Patrick Reed',score:'-15',margin:'1 shot'},
-    {year:2017,name:'Sergio Garcia',score:'-9',margin:'Playoff'},
-    {year:2016,name:'Danny Willett',score:'-5',margin:'3 shots'},
-  ],
-  'RBC Heritage': [
-    {year:2025,name:'Matthieu Pavon',score:'-19',margin:'1 shot'},
-    {year:2024,name:'Shane Lowry',score:'-18',margin:'Playoff'},
-    {year:2023,name:'Matt Fitzpatrick',score:'-19',margin:'1 shot'},
-    {year:2022,name:'Jordan Spieth',score:'-22',margin:'1 shot'},
-    {year:2021,name:'Stewart Cink',score:'-23',margin:'2 shots'},
-    {year:2020,name:'Webb Simpson',score:'-22',margin:'2 shots'},
-    {year:2019,name:'C.T. Pan',score:'-15',margin:'1 shot'},
-    {year:2018,name:'Satoshi Kodaira',score:'-17',margin:'Playoff'},
-    {year:2017,name:'Wesley Bryan',score:'-17',margin:'1 shot'},
-    {year:2016,name:'Branden Grace',score:'-14',margin:'1 shot'},
-  ],
-  'Truist Championship': [
-    {year:2025,name:'Scottie Scheffler',score:'-21',margin:'2 shots'},
-    {year:2024,name:'Scottie Scheffler',score:'-29',margin:'5 shots'},
-    {year:2023,name:'Scottie Scheffler',score:'-25',margin:'4 shots'},
-    {year:2022,name:'Scottie Scheffler',score:'-25',margin:'1 shot'},
-    {year:2021,name:'Patrick Cantlay',score:'-23',margin:'1 shot'},
-    {year:2020,name:'Jon Rahm',score:'-21',margin:'3 shots'},
-    {year:2019,name:'Patrick Cantlay',score:'-22',margin:'Playoff'},
-    {year:2018,name:'Patrick Cantlay',score:'-19',margin:'1 shot'},
-    {year:2017,name:'Dustin Johnson',score:'-17',margin:'1 shot'},
-    {year:2016,name:'Jason Day',score:'-20',margin:'1 shot'},
-  ],
-  'PGA Championship': [
-    {year:2025,name:'Scottie Scheffler',score:'-11',margin:'5 shots'},
-    {year:2024,name:'Xander Schauffele',score:'-21',margin:'1 shot'},
-    {year:2023,name:'Brooks Koepka',score:'-9',margin:'2 shots'},
-    {year:2022,name:'Justin Thomas',score:'-5',margin:'Playoff'},
-    {year:2021,name:'Phil Mickelson',score:'-6',margin:'2 shots'},
-    {year:2020,name:'Collin Morikawa',score:'-13',margin:'2 shots'},
-    {year:2019,name:'Brooks Koepka',score:'-8',margin:'2 shots'},
-    {year:2018,name:'Brooks Koepka',score:'-16',margin:'2 shots'},
-    {year:2017,name:'Justin Thomas',score:'-8',margin:'2 shots'},
-    {year:2016,name:'Jimmy Walker',score:'-14',margin:'1 shot'},
-  ],
-  'U.S. Open': [
-    {year:2025,name:'J.J. Spaun',score:'-1',margin:'2 shots'},
-    {year:2024,name:'Bryson DeChambeau',score:'-6',margin:'1 shot'},
-    {year:2023,name:'Wyndham Clark',score:'-10',margin:'1 shot'},
-    {year:2022,name:'Matt Fitzpatrick',score:'-6',margin:'1 shot'},
-    {year:2021,name:'Jon Rahm',score:'-6',margin:'1 shot'},
-    {year:2020,name:'Bryson DeChambeau',score:'-6',margin:'6 shots'},
-    {year:2019,name:'Gary Woodland',score:'-13',margin:'3 shots'},
-    {year:2018,name:'Brooks Koepka',score:'+1',margin:'1 shot'},
-    {year:2017,name:'Brooks Koepka',score:'-16',margin:'4 shots'},
-    {year:2016,name:'Dustin Johnson',score:'-4',margin:'3 shots'},
-  ],
-  'The Open Championship': [
-    {year:2025,name:'Scottie Scheffler',score:'-13',margin:'1 shot'},
-    {year:2024,name:'Xander Schauffele',score:'-9',margin:'1 shot'},
-    {year:2023,name:'Brian Harman',score:'-13',margin:'6 shots'},
-    {year:2022,name:'Cameron Smith',score:'-20',margin:'1 shot'},
-    {year:2021,name:'Collin Morikawa',score:'-15',margin:'2 shots'},
-    {year:2019,name:'Shane Lowry',score:'-15',margin:'6 shots'},
-    {year:2018,name:'Francesco Molinari',score:'-8',margin:'2 shots'},
-    {year:2017,name:'Jordan Spieth',score:'-12',margin:'3 shots'},
-    {year:2016,name:'Henrik Stenson',score:'-20',margin:'3 shots'},
-    {year:2015,name:'Zach Johnson',score:'-15',margin:'Playoff'},
-  ],
-  'default': []
-};
+    const owgrMap = {};
+    sa(rankings.rankings || rankings).forEach(p => { if (p && p.dg_id) owgrMap[p.dg_id] = p.owgr_rank || null; });
 
-function renderHistory(eventName) {
-  const winners = PAST_WINNERS[eventName] || PAST_WINNERS['default'];
-  const fieldNames = new Set(allPlayers.map(p=>p.name.toLowerCase()));
-  const html = winners.map(w => {
-    const inField = fieldNames.has(w.name.toLowerCase());
-    return `<div class="winner-row">
-      <span class="winner-year">${w.year}</span>
-      <span class="winner-name">${w.name} ${inField?'<span class="in-field-tag">IN FIELD</span>':''}</span>
-      <span class="winner-score">${w.score}</span>
-      <span class="winner-margin">${w.margin}</span>
-    </div>`;
-  }).join('') || '<div style="color:var(--text-muted);font-size:13px;">Historical data not available for this event.</div>';
-  document.getElementById('winnersList').innerHTML = html;
-  const inFieldWinners = winners.filter(w=>fieldNames.has(w.name.toLowerCase()));
-  const champNames = new Set(winners.map(w=>w.name.toLowerCase()));
-  document.getElementById('champProfile').innerHTML = `
-    <div style="font-size:13px;line-height:1.8;">
-      <p style="margin-bottom:1rem;"><strong>Past champions in this field:</strong> ${inFieldWinners.length > 0 ? inFieldWinners.map(w=>w.name).join(', ') : 'None'}</p>
-      <div style="background:var(--cream-dark);border-radius:var(--radius-sm);padding:1rem;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px;">What wins this tournament</div>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
-          <div>🎯 <strong>Elite approach play</strong> — past champions average SG: Approach +0.7 per round</div>
-          <div>⛳ <strong>Precise short game</strong> — Augusta demands exceptional scrambling and putting</div>
-          <div>📍 <strong>Course experience</strong> — players with 5+ starts here have a measurable edge</div>
-          <div>🏆 <strong>Major pedigree</strong> — ${(winners.filter(w=>inFieldWinners.map(x=>x.name).includes(w.name)).length)} former champs in the field this week</div>
-        </div>
-      </div>
-    </div>`;
-}
+    const bWinMap = {}, bT10Map = {}, bMCMap = {}, bFRLMap = {};
+    sa(betWin.odds).forEach(p => { if (p && p.dg_id) bWinMap[p.dg_id] = p; });
+    sa(betT10.odds).forEach(p => { if (p && p.dg_id) bT10Map[p.dg_id] = p; });
+    sa(betMC.odds).forEach(p => { if (p && p.dg_id) bMCMap[p.dg_id] = p; });
+    sa(betFRL.odds).forEach(p => { if (p && p.dg_id) bFRLMap[p.dg_id] = p; });
 
-// ── RENDER ALL ───────────────────────────────────────────────────
-function renderAll() {
-  allPlayers.forEach(p => p.used = isUsed(p.name));
-  renderTopPick();
-  renderPicks();
-  renderTable();
-  renderBetting();
-  renderFRL();
-  renderRecommendedParlay();
-  const eventName = document.getElementById('hTournament').textContent;
-  renderHistory(eventName);
-}
-
-// ── TOP PICK ─────────────────────────────────────────────────────
-function renderTopPick() {
-  const avail = allPlayers.filter(p=>!p.used);
-  const scored = [...avail].sort((a,b)=>(b.win+b.dna*10)-(a.win+a.dna*10));
-  const top = scored[0];
-  if (!top) return;
-  const dnaLbl = top.dna>=0.3?'Excellent':top.dna>=0.1?'Good':'Neutral';
-  document.getElementById('bPickName').textContent = top.name;
-  document.getElementById('bPickDetail').innerHTML = `
-    <span>🏆 Win: <strong>${top.win.toFixed(1)}%</strong></span>
-    <span>📊 Top 10: <strong>${top.top10.toFixed(1)}%</strong></span>
-    <span>🧬 DNA: <strong>${top.dna.toFixed(3)}</strong> (${dnaLbl})</span>
-    <span>🌍 OWGR: <strong>${top.owgr?'#'+top.owgr:'N/A'}</strong></span>
-    ${top.dk_win?`<span>💰 DK: <strong>${top.dk_win>0?'+':''}${top.dk_win}</strong></span>`:''}
-  `;
-  const reasons = top.reasons.length ? top.reasons.join(' · ') : 'Top model pick this week based on overall skill and course fit.';
-  document.getElementById('bPickReason').innerHTML = `<strong>Why this pick?</strong>${reasons}`;
-}
-
-// ── PICKS LIST ───────────────────────────────────────────────────
-function renderPicks() {
-  const avail = allPlayers.filter(p=>!p.used);
-  const scored = [...avail].sort((a,b)=>(b.win+b.dna*10)-(a.win+a.dna*10)).slice(0,8);
-  const nums = ['n1','n2','n3','nr','nr','nr','nr','nr'];
-  const recLabel = p => {
-    if (p.win>=10&&p.dna>=0.15) return {l:'Strong pick',c:'rec-strong'};
-    if (p.win>=5&&p.dna>=0.1) return {l:'Good pick',c:'rec-good'};
-    return {l:'Consider',c:'rec-consider'};
-  };
-  document.getElementById('picksList').innerHTML = scored.map((p,i)=>{
-    const rec = recLabel(p);
-    const dnaLbl = p.dna>=0.3?{l:'Excellent',c:'badge-green'}:p.dna>=0.1?{l:'Good',c:'badge-blue'}:{l:'Neutral',c:'badge-gray'};
-    return `<div class="pick-card">
-      <div class="pick-num ${nums[i]}">${i+1}</div>
-      <div class="pick-body">
-        <div class="pick-pname">${p.name} ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''} <span class="badge ${dnaLbl.c}">${dnaLbl.l} fit</span></div>
-        <div class="pick-stats">
-          <span>Win: ${p.win.toFixed(1)}%</span>
-          <span>Top 10: ${p.top10.toFixed(1)}%</span>
-          <span>Make cut: ${p.make_cut.toFixed(1)}%</span>
-          <span>DNA: ${p.dna.toFixed(3)}</span>
-          ${p.dk_win?`<span>DK: ${p.dk_win>0?'+':''}${p.dk_win}</span>`:''}
-        </div>
-        <div class="pick-reasons">${p.reasons.map(r=>`<span class="reason-tag">${r}</span>`).join('')}</div>
-      </div>
-      <div class="pick-actions">
-        <span class="rec-pill ${rec.c}">${rec.l}</span>
-        <button class="mark-btn" data-name="${p.name.replace(/'/g,\"&#39;\")}" onclick="toggleUsed(this.dataset.name)">Mark used</button>
-      </div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('reasoningList').innerHTML = scored.map((p,i)=>`
-    <div style="padding:10px 0;border-bottom:1px solid var(--cream-dark);">
-      <div style="font-size:13px;font-weight:600;margin-bottom:6px;">${i+1}. ${p.name}</div>
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">${p.reasons.length?p.reasons.join('. ').replace(/\.$/, '')+'.' : 'Solid all-around pick with good model probability.'}</div>
-      ${p.sg_app!=null?`<div style="margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;">${sgMini('App',p.sg_app)}${sgMini('Putt',p.sg_putt)}${sgMini('OTT',p.sg_ott)}</div>`:''}
-    </div>`).join('');
-}
-
-function sgMini(label, val) {
-  if (val == null) return '';
-  const cls = val>=0.4?'cell-great':val>=0.2?'cell-good':val>=0?'cell-neutral':val>=-0.2?'cell-poor':'cell-bad';
-  return `<span style="font-size:11px;"><span style="color:var(--text-muted);">${label}:</span> <span class="${cls}">${val>=0?'+':''}${val.toFixed(2)}</span></span>`;
-}
-
-// ── TABLE ────────────────────────────────────────────────────────
-function sortTable(col) {
-  if (currentSort.col===col) currentSort.dir=currentSort.dir==='desc'?'asc':'desc';
-  else { currentSort.col=col; currentSort.dir=col==='name'||col==='country'?'asc':'desc'; }
-  renderTable();
-}
-function renderTable() {
-  const filter = document.getElementById('fFilter').value;
-  let list = [...allPlayers];
-  if (filter==='avail') list = list.filter(p=>!p.used);
-  if (filter==='top25') list = list.filter(p=>p.rank<=25);
-  const {col,dir} = currentSort;
-  list.sort((a,b)=>{
-    let av=a[col],bv=b[col];
-    if (col==='name'||col==='country') { av=av||''; bv=bv||''; return dir==='asc'?av.localeCompare(bv):bv.localeCompare(av); }
-    av=av??-999; bv=bv??-999;
-    return dir==='asc'?av-bv:bv-av;
-  });
-  const cols = ALL_COLS.filter(c=>activeCols.has(c.key));
-  const dnaMax = Math.max(...list.map(p=>Math.abs(p.dna||0)),0.01);
-  document.getElementById('tHead').innerHTML = '<tr>'+cols.map(c=>{
-    const isAct = currentSort.col===c.key;
-    const arr = isAct?(currentSort.dir==='desc'?'▼':'▲'):'';
-    const onclick = c.noSort?'':` onclick="sortTable('${c.key}')"`;
-    const tip = c.tip ? tipHtml(c.key,c.label) : c.label;
-    return `<th${onclick}>${tip}<span class="sort-arr">${arr}</span></th>`;
-  }).join('')+'</tr>';
-  document.getElementById('tBody').innerHTML = list.map((p,i)=>{
-    const rowCls = p.used?'used-row':i<3?'top3-row':'';
-    const cells = cols.map(c=>{
-      if (c.special==='dna') return `<td>${dnaBar(p.dna)}</td>`;
-      if (c.special==='status') return `<td style="white-space:nowrap;"><span style="font-size:11px;font-weight:600;color:${p.used?'var(--red)':'#15803d'};">${p.used?'Used':'Available'}</span> <button class="mark-btn ${p.used?'unmark':''}" data-name="${p.name.replace(/'/g,'&#39;')}" onclick="toggleUsed(this.dataset.name)">${p.used?'Unmark':'Mark used'}</button></td>`;
-      if (c.key==='name') return `<td style="font-weight:${p.used?400:600};">${p.name}</td>`;
-      if (c.key==='owgr') return `<td>${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:'<span class="cell-neutral">—</span>'}</td>`;
-      const val = p[c.key];
-      return `<td>${val!=null?c.fmt(val,p):'<span class="cell-neutral">—</span>'}</td>`;
-    }).join('');
-    return `<tr class="${rowCls}">${cells}</tr>`;
-  }).join('');
-}
-
-// ── BETTING ──────────────────────────────────────────────────────
-function impliedPct(odds) {
-  if (!odds) return null;
-  const n = parseInt(odds);
-  if (isNaN(n)) return null;
-  return n > 0 ? 100/(n+100)*100 : Math.abs(n)/(Math.abs(n)+100)*100;
-}
-function edgeCell(modelPct, odds) {
-  const imp = impliedPct(odds);
-  if (!imp) return '<span class="cell-neutral">—</span>';
-  const edge = modelPct - imp;
-  if (edge > 3) return `<span class="ev-strong">+${edge.toFixed(1)}%</span>`;
-  if (edge > 0) return `<span class="ev-pos">+${edge.toFixed(1)}%</span>`;
-  return `<span class="ev-neg">${edge.toFixed(1)}%</span>`;
-}
-function renderBetting() {
-  const top = allPlayers.filter(p=>p.win>0.3).slice(0,12);
-  document.getElementById('betWinBody').innerHTML = top.map(p=>`<tr>
-    <td style="font-weight:500;">${p.name}</td>
-    <td>${colorPct(p.win,[1,3,6,10])}</td>
-    <td>${oddsCell(p.dk_win)}</td>
-    <td>${oddsCell(p.fanduel_win)}</td>
-    <td>${oddsCell(p.caesars_win)}</td>
-    <td>${edgeCell(p.win,p.dk_win)}</td>
-  </tr>`).join('');
-
-  document.getElementById('betT10Body').innerHTML = top.slice(0,10).map(p=>`<tr>
-    <td style="font-weight:500;">${p.name}</td>
-    <td>${colorPct(p.top10,[10,20,30,40])}</td>
-    <td>${oddsCell(p.dk_top10)}</td>
-    <td>${edgeCell(p.top10,p.dk_top10)}</td>
-  </tr>`).join('');
-
-  document.getElementById('betMCBody').innerHTML = allPlayers.filter(p=>p.make_cut<80).slice(0,8).map(p=>`<tr>
-    <td style="font-weight:500;">${p.name}</td>
-    <td>${colorPct(p.make_cut,[50,60,70,80])}</td>
-    <td>${oddsCell(p.dk_mc)}</td>
-    <td>${edgeCell(p.make_cut,p.dk_mc)}</td>
-  </tr>`).join('');
-
-  document.getElementById('betCompBody').innerHTML = top.slice(0,15).map(p=>{
-    const odds = [p.dk_win,p.fanduel_win,p.caesars_win,p.betmgm_win,p.pinnacle_win];
-    const best = Math.max(...odds.filter(o=>o!=null).map(o=>parseInt(o)||0));
-    const highlight = (o) => {
-      if (!o) return '<span class="cell-neutral">—</span>';
-      const n = parseInt(o);
-      const isBest = n === best && n > 0;
-      return `<span class="odds-val ${n>0?'odds-pos':'odds-neg'}" style="${isBest?'background:#dcfce7;padding:2px 6px;border-radius:4px;':''}">${n>0?'+':''}${n}</span>`;
+    const parseOdds = (v) => {
+      if (!v) return null;
+      const n = parseInt(String(v).replace('+', ''));
+      return isNaN(n) ? null : n;
     };
-    return `<tr>
-      <td style="font-weight:500;">${p.name}</td>
-      <td>${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:'—'}</td>
-      <td>${colorPct(p.win,[1,3,6,10])}</td>
-      <td>${highlight(p.dk_win)}</td>
-      <td>${highlight(p.fanduel_win)}</td>
-      <td>${highlight(p.caesars_win)}</td>
-      <td>${highlight(p.betmgm_win)}</td>
-      <td>${highlight(p.pinnacle_win)}</td>
-      <td><span class="odds-val" style="color:var(--gold);">${p.datagolf_baseline||'—'}</span></td>
-    </tr>`;
-  }).join('');
-}
 
-// ── MATCHUPS ─────────────────────────────────────────────────────
-function renderMatchups(matchupData) {
-  if (!matchupData || !matchupData.length) {
-    document.getElementById('matchupsList').innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:1rem 0;">Matchup data not available.</div>';
-    return;
+    const impliedPct = (odds) => {
+      if (!odds) return null;
+      return odds > 0 ? 100 / (odds + 100) * 100 : Math.abs(odds) / (Math.abs(odds) + 100) * 100;
+    };
+
+    const players = sa(decomp.players).map(p => {
+      if (!p) return null;
+      const pred = predsMap[p.dg_id] || predsMap[(p.player_name || '').toLowerCase()] || {};
+      const s = sgMap[p.dg_id] || {};
+      const bw = bWinMap[p.dg_id] || {};
+      const bt = bT10Map[p.dg_id] || {};
+      const bm = bMCMap[p.dg_id] || {};
+      const bf = bFRLMap[p.dg_id] || {};
+
+      const dk_win = parseOdds(bw.draftkings);
+      const dk_top10 = parseOdds(bt.draftkings);
+      const dk_mc = parseOdds(bm.draftkings);
+      const dk_frl = parseOdds(bf.draftkings);
+      const fit = p.total_fit_adjustment || 0;
+      const hist = p.course_history_adjustment || 0;
+      const app = p.cf_approach_comp || 0;
+      const sgg = p.cf_short_comp || 0;
+      const dna = (fit * 0.35) + (hist * 0.30) + (app * 0.20) + (sgg * 0.15);
+      const winPct = (pred.win || 0) * 100;
+      const bookImp = impliedPct(dk_win);
+      const edge = bookImp ? winPct - bookImp : 0;
+
+      const reasons = [];
+      if (winPct > 10) reasons.push(`Elite win probability ${winPct.toFixed(1)}%`);
+      else if (winPct > 5) reasons.push(`Strong ${winPct.toFixed(1)}% win probability`);
+      if (hist > 0.1) reasons.push(`Excellent course history (+${hist.toFixed(2)})`);
+      if (dna > 0.15) reasons.push(`Strong DNA fit score ${dna.toFixed(3)}`);
+      if ((s.sg_app || 0) > 0.6) reasons.push(`Elite approach play SG +${s.sg_app.toFixed(2)}`);
+      if ((s.sg_putt || 0) > 0.4) reasons.push(`Hot putter SG +${s.sg_putt.toFixed(2)}`);
+      if ((s.sg_ott || 0) > 0.6) reasons.push(`Driving dominance SG +${s.sg_ott.toFixed(2)}`);
+      if (edge > 2) reasons.push(`+${edge.toFixed(1)}% edge vs DraftKings`);
+      if ((p.major_adjustment || 0) > 0.08) reasons.push(`Strong major performer`);
+      if ((pred.top_10 || 0) * 100 > 40) reasons.push(`${((pred.top_10 || 0) * 100).toFixed(0)}% top-10 probability`);
+
+      const sg_app = s.sg_app ?? null;
+      const sg_arg = s.sg_arg ?? null;
+      const sg_ott = s.sg_ott ?? null;
+
+      return {
+        player_name: p.player_name || '',
+        dg_id: p.dg_id,
+        country: p.country || '',
+        age: p.age || null,
+        owgr: owgrMap[p.dg_id] || null,
+        win: winPct,
+        top_5: (pred.top_5 || 0) * 100,
+        top_10: (pred.top_10 || 0) * 100,
+        top_20: (pred.top_20 || 0) * 100,
+        make_cut: (pred.make_cut || 0) * 100,
+        total_fit_adjustment: fit,
+        course_history_adjustment: hist,
+        cf_approach_comp: app,
+        cf_short_comp: sgg,
+        dna, final_pred: p.final_pred || 0,
+        baseline_pred: p.baseline_pred || 0,
+        age_adjustment: p.age_adjustment || 0,
+        driving_distance_adjustment: p.driving_distance_adjustment || 0,
+        driving_accuracy_adjustment: p.driving_accuracy_adjustment || 0,
+        major_adjustment: p.major_adjustment || 0,
+        timing_adjustment: p.timing_adjustment || 0,
+        sg_putt: s.sg_putt ?? null, sg_arg, sg_app, sg_ott,
+        sg_t2g: (sg_app !== null && sg_arg !== null && sg_ott !== null) ? parseFloat((sg_app + sg_arg + sg_ott).toFixed(3)) : null,
+        sg_total: s.sg_total ?? null,
+        driving_distance: s.driving_dist ?? null,
+        driving_accuracy: s.driving_acc ?? null,
+        dk_win, dk_top10, dk_mc, dk_frl,
+        fanduel_win: bw.fanduel || null, caesars_win: bw.caesars || null,
+        betmgm_win: bw.betmgm || null, pinnacle_win: bw.pinnacle || null,
+        datagolf_baseline: (bw.datagolf || {}).baseline || null,
+        fanduel_frl: bf.fanduel || null, caesars_frl: bf.caesars || null,
+        datagolf_frl: (bf.datagolf || {}).baseline || null,
+        book_implied: bookImp, edge_vs_book: edge,
+        reasons: reasons.slice(0, 4)
+      };
+    }).filter(Boolean);
+
+    players.sort((a, b) => b.win - a.win);
+
+    const LOCATIONS = {
+      'Masters Tournament':       { lat: 33.5031, lon: -82.0219, name: 'Augusta, GA' },
+      'RBC Heritage':             { lat: 32.1416, lon: -80.8392, name: 'Hilton Head Island, SC' },
+      'Truist Championship':      { lat: 33.0282, lon: -84.5773, name: 'Peachtree City, GA' },
+      'PGA Championship':         { lat: 35.1495, lon: -80.8439, name: 'Charlotte, NC' },
+      'U.S. Open':                { lat: 40.6259, lon: -74.0594, name: 'Shinnecock Hills, NY' },
+      'The Open Championship':    { lat: 55.3781, lon: -3.4360,  name: 'Scotland, UK' },
+      'The Players Championship': { lat: 30.1975, lon: -81.3964, name: 'Ponte Vedra Beach, FL' },
+      'Memorial Tournament':      { lat: 40.0992, lon: -83.1521, name: 'Dublin, OH' },
+    };
+
+    res.status(200).json({
+      event_name: preds.event_name || 'Current Tournament',
+      last_updated: preds.last_updated || '',
+      course_name: decomp.course_name || '',
+      event_location: LOCATIONS[preds.event_name] || { lat: 32.1416, lon: -80.8392, name: 'Tournament Location' },
+      players,
+      matchups: sa(mu.matchups)
+    });
+
+  } catch (e) {
+    res.status(500).json({ error: e.message, stack: e.stack });
   }
-  document.getElementById('matchupsList').innerHTML = matchupData.slice(0,10).map(m=>{
-    const p1 = fmtName(m.p1_player_name||'');
-    const p2 = fmtName(m.p2_player_name||'');
-    const o1 = m.p1_odds||m.draftkings?.p1||null;
-    const o2 = m.p2_odds||m.draftkings?.p2||null;
-    return `<div class="matchup-row">
-      <span class="m-player">${p1}</span>
-      <span class="m-odds ${parseInt(o1)>0?'odds-pos':'odds-neg'}">${o1||'—'}</span>
-      <span class="m-vs">vs</span>
-      <span class="m-odds ${parseInt(o2)>0?'odds-pos':'odds-neg'}">${o2||'—'}</span>
-      <span class="m-player" style="text-align:right;">${p2}</span>
-    </div>`;
-  }).join('');
 }
-
-// ── USED MANAGER ─────────────────────────────────────────────────
-function renderUsedMgr() {
-  document.getElementById('usedCount').textContent = usedPlayers.size;
-
-  // Chips
-  document.getElementById('usedChips').innerHTML = [...usedPlayers].map(n=>
-    `<div class="used-chip">${n} <button class="chip-remove" data-name="${n.replace(/"/g,'&quot;')}" title="Remove">✕</button></div>`
-  ).join('') || '<span style="font-size:12px;color:var(--text-muted);">No players used yet</span>';
-
-  // Player list
-  const search = (document.getElementById('usedSearch').value||'').toLowerCase();
-  const filtered = allPlayers.filter(p=>!search||p.name.toLowerCase().includes(search));
-  document.getElementById('usedList').innerHTML = filtered.map(p=>`
-    <div class="used-item ${p.used?'is-used':''}" data-name="${p.name.replace(/"/g,'&quot;')}">
-      <span style="font-weight:${p.used?600:400};color:${p.used?'var(--red)':'var(--text)'};">${p.name} ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}</span>
-      <button class="toggle-used-btn ${p.used?'btn-unmark':'btn-mark'}" data-name="${p.name.replace(/"/g,'&quot;')}">${p.used?'Unmark':'Mark used'}</button>
-    </div>`).join('');
-
-  // Event delegation for chips
-  document.getElementById('usedChips').onclick = (e) => {
-    const btn = e.target.closest('.chip-remove');
-    if (btn) { toggleUsed(btn.dataset.name); }
-  };
-
-  // Event delegation for list
-  document.getElementById('usedList').onclick = (e) => {
-    const btn = e.target.closest('.toggle-used-btn');
-    if (btn) { toggleUsed(btn.dataset.name); }
-  };
-}
-
-// ── COLUMN PICKER ────────────────────────────────────────────────
-function openColPicker() {
-  const groups = {};
-  ALL_COLS.forEach(c=>{ if(!groups[c.group]) groups[c.group]=[]; groups[c.group].push(c); });
-  document.getElementById('colGroups').innerHTML = Object.entries(groups).map(([g,cols])=>`
-    <div class="col-group"><div class="col-group-title">${g}</div>
-    <div class="col-grid">${cols.map(c=>`
-      <label class="col-item">
-        <input type="checkbox" ${activeCols.has(c.key)?'checked':''} onchange="toggleCol('${c.key}',this.checked)">
-        ${c.label}
-      </label>`).join('')}
-    </div></div>`).join('');
-  document.getElementById('colModal').style.display = 'flex';
-}
-function toggleCol(key, checked) {
-  if (checked) activeCols.add(key); else activeCols.delete(key);
-  saveCols(); renderTable();
-}
-function closeColModal() { document.getElementById('colModal').style.display = 'none'; }
-function resetCols() {
-  activeCols = new Set(ALL_COLS.filter(c=>c.default).map(c=>c.key));
-  saveCols(); openColPicker(); renderTable();
-}
-
-// ── FRL ANALYSIS ────────────────────────────────────────────────
-function renderFRL() {
-  // FRL scoring: SG:OTT is the #1 predictor (big hitters go low rd1),
-  // followed by approach play, overall form, and course day-1 history.
-  // Darkhorse criteria: odds 1500+, elevated OTT or approach, low ownership expected.
-
-  const scoreFRL = p => {
-    const ottScore  = (p.sg_ott  || 0) * 3.0;
-    const appScore  = (p.sg_app  || 0) * 1.5;
-    const argScore  = (p.sg_arg  || 0) * 0.8;
-    const formScore = p.win * 0.8;
-    const histScore = (p.history || 0) * 2.0;
-    const ageBonus  = (p.age && p.age < 28) ? 0.3 : 0; // young aggressive players go low early
-    return ottScore + appScore + argScore + formScore + histScore + ageBonus;
-  };
-
-  const all = allPlayers.filter(p => p.dk_frl || p.win > 0.3).map(p => ({
-    ...p,
-    frlScore: scoreFRL(p),
-    frlImplied: p.dk_frl ? (p.dk_frl > 0 ? 100/(p.dk_frl+100)*100 : Math.abs(p.dk_frl)/(Math.abs(p.dk_frl)+100)*100) : null
-  })).sort((a,b) => b.frlScore - a.frlScore);
-
-  // Top picks — high score, any odds range
-  const topFRL = all.slice(0, 8).map(p => {
-    const reasons = [];
-    if ((p.sg_ott||0) > 0.5)  reasons.push(`Elite driver SG:OTT +${p.sg_ott.toFixed(2)}`);
-    else if ((p.sg_ott||0) > 0.2) reasons.push(`Strong off tee SG:OTT +${p.sg_ott.toFixed(2)}`);
-    if ((p.driving_distance||0) > 10) reasons.push(`Distance advantage +${p.driving_distance.toFixed(0)} yds`);
-    if ((p.sg_app||0) > 0.6)  reasons.push(`Elite approach SG +${p.sg_app.toFixed(2)}`);
-    if (p.history > 0.1)       reasons.push(`Positive day-1 course history`);
-    if (p.win > 8)             reasons.push(`Overall tourney favorite`);
-    if ((p.age||30) < 27)      reasons.push(`Young aggressive style — low scoring round 1`);
-    if (p.dk_frl && p.dk_frl > 600) reasons.push(`Value price ${p.dk_frl>0?'+':''}${p.dk_frl}`);
-    return { ...p, frlReasons: reasons.slice(0,3) };
-  });
-
-  // Darkhorse picks — odds 1500+, meaningful OTT or approach, editorial note
-  // We look for: strong ball-strikers priced as longshots, young guns, streaky putters
-  const DARKHORSE_NOTES = {
-    'Ludvig Aberg':      { note: 'Young Swede with elite ball-striking who tends to start fast. Massive distance advantage on day 1 when course is fresh. Priced too long given his SG profile.', tag: '🔥 Young gun' },
-    'Cameron Young':     { note: 'Consistently one of the longest hitters on tour — course suits his power game. Has shown ability to post low early rounds and contend on Sunday.', tag: '💣 Power play' },
-    'Nicolai Hojgaard':  { note: 'Aggressive young Dane who goes flag-hunting. High variance round 1 style could produce a 63-64 just as easily as a 72. Elite iron play when locked in.', tag: '🎯 Boom or bust' },
-    'Akshay Bhatia':     { note: 'One of the most electric ball-strikers in the field. Young, fearless, and has already shown major championship pedigree. Underpriced for FRL given his OTT numbers.', tag: '⚡ Sleeper alert' },
-    'Chris Gotterup':    { note: 'Legitimate long hitter with improving approach numbers. Augusta day 1 rewards bombers before the course tightens up — Gotterup fits that profile perfectly.', tag: '💣 Bomber' },
-    'Collin Morikawa':   { note: 'The best iron player in the world on his day. If Morikawa is dialed in on approach, a first round 65-66 is completely in play. Putting has cost him here before but the ball-striking is transcendent.', tag: '🎯 Iron wizard' },
-    'Min Woo Lee':       { note: 'Extremely aggressive style, plays fast and fearless. Has the game to go very low in round 1 when adrenaline is high. Underrated short game fits Augusta perfectly.', tag: '🔥 Aggressive' },
-    'Tommy Fleetwood':   { note: 'Fleetwood is a notoriously good major starter — tends to post low rounds early when the course plays friendly. Strong approach game ideally suited to Augusta National.', tag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Major starter' },
-    'Matt Fitzpatrick':  { note: 'Elite course management, precise iron play, and excellent Augusta history. Not a bomber but finds fairways and hits greens at a premium rate. A quintessential low-first-round type.', tag: '📐 Precision pick' },
-    'Hideki Matsuyama':  { note: 'Former Masters champion who knows Augusta intimately. Has posted multiple low opening rounds here. His combination of power and precision makes him a dangerous FRL candidate at his current price.', tag: '🏆 Champion pedigree' },
-  };
-
-  const darkhorsePool = all.filter(p => {
-    const hasOdds = p.dk_frl && p.dk_frl >= 1500;
-    const hasNotes = !!DARKHORSE_NOTES[p.name];
-    const hasGame = (p.sg_ott||0) > 0.1 || (p.sg_app||0) > 0.3;
-    return (hasOdds || hasNotes) && hasGame;
-  }).slice(0, 5).map(p => ({
-    ...p,
-    dhNote: DARKHORSE_NOTES[p.name]?.note || `Underrated FRL candidate — SG:OTT ${p.sg_ott!=null?(p.sg_ott>=0?'+':'')+p.sg_ott.toFixed(2):'N/A'} with strong approach numbers. Long odds create excellent risk/reward for a single round bet.`,
-    dhTag: DARKHORSE_NOTES[p.name]?.tag || '🎲 Value play'
-  }));
-
-  const nums = ['n1','n2','n3','nr','nr','nr','nr','nr'];
-  document.getElementById('frlList').innerHTML = `
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px;">Model top picks</div>
-    ${topFRL.map((p,i) => `
-      <div class="pick-card">
-        <div class="pick-num ${nums[i]}">${i+1}</div>
-        <div class="pick-body">
-          <div class="pick-pname">${p.name} ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}</div>
-          <div class="pick-stats">
-            <span>FRL Score: <strong>${p.frlScore.toFixed(2)}</strong></span>
-            <span>Win%: ${p.win.toFixed(1)}%</span>
-            ${p.sg_ott!=null?`<span>SG:OTT: ${p.sg_ott>=0?'+':''}${p.sg_ott.toFixed(2)}</span>`:''}
-            ${p.dk_frl?`<span>DK: ${p.dk_frl>0?'+':''}${p.dk_frl}</span>`:''}
-          </div>
-          <div class="pick-reasons">${p.frlReasons.map(r=>`<span class="reason-tag">${r}</span>`).join('')}</div>
-        </div>
-      </div>`).join('')}
-
-    <div style="margin-top:1.5rem;padding-top:1rem;border-top:2px dashed var(--gold);"></div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);">Darkhorse FRL picks</div>
-      <div style="font-size:10px;background:var(--amber-light);color:var(--amber);padding:2px 8px;border-radius:999px;font-weight:600;">HIGH RISK / HIGH REWARD</div>
-    </div>
-    ${darkhorsePool.map(p => `
-      <div style="border:1px solid var(--gold);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;background:linear-gradient(135deg,#fffbeb,#fef9c3);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:14px;font-weight:700;">${p.name}</span>
-            ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}
-            <span style="font-size:11px;background:var(--gold);color:white;padding:2px 8px;border-radius:999px;font-weight:600;">${p.dhTag}</span>
-          </div>
-          <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:800;color:var(--amber);">${p.dk_frl?`${p.dk_frl>0?'+':''}${p.dk_frl}`:'N/A'}</div>
-        </div>
-        <div style="font-size:12px;line-height:1.6;color:var(--text);margin-bottom:8px;">${p.dhNote}</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--text-muted);">
-          <span>Win: <strong>${p.win.toFixed(1)}%</strong></span>
-          ${p.sg_ott!=null?`<span>SG:OTT: <strong style="color:${p.sg_ott>=0?'#15803d':'var(--red)'};">${p.sg_ott>=0?'+':''}${p.sg_ott.toFixed(2)}</strong></span>`:''}
-          ${p.sg_app!=null?`<span>SG:App: <strong style="color:${p.sg_app>=0?'#15803d':'var(--red)'};">${p.sg_app>=0?'+':''}${p.sg_app.toFixed(2)}</strong></span>`:''}
-          <span>FRL Score: <strong>${p.frlScore.toFixed(2)}</strong></span>
-        </div>
-      </div>`).join('')}`;
-
-  document.getElementById('frlOddsBody').innerHTML = topFRL.map(p => `<tr>
-    <td style="font-weight:500;">${p.name}</td>
-    <td>${colorPct(p.win,[1,3,6,10])}</td>
-    <td>${p.sg_ott!=null?sgBar(p.sg_ott,0.3,0.6):'<span class="cell-neutral">—</span>'}</td>
-    <td>${oddsCell(p.dk_frl)}</td>
-    <td>${oddsCell(p.fanduel_frl)}</td>
-    <td>${oddsCell(p.caesars_frl)}</td>
-    <td><span style="color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;">${p.datagolf_frl||'—'}</span></td>
-  </tr>`).join('');
-}
-
-// ── PARLAY BUILDER ───────────────────────────────────────────────
-let parlayLegs = [];
-
-function americanToDecimal(odds) {
-  const n = parseInt(odds);
-  if (isNaN(n)) return 1;
-  return n > 0 ? (n/100)+1 : (100/Math.abs(n))+1;
-}
-function decimalToAmerican(dec) {
-  if (dec >= 2) return '+' + Math.round((dec-1)*100);
-  return Math.round(-100/(dec-1)).toString();
-}
-function calcParlayOdds(legs) {
-  if (!legs.length) return null;
-  const dec = legs.reduce((acc,l) => acc * americanToDecimal(l.odds), 1);
-  return decimalToAmerican(dec);
-}
-
-function renderRecommendedParlay() {
-  // Build recommended parlay targeting +400 to +1000
-  // Strategy: mix 1 mid-range win bet + 2 top-10 bets for correlated value
-  const avail = allPlayers.filter(p => !p.used && p.win > 0.5);
-  const candidates = avail.filter(p => p.dk_win && p.dk_win >= 400 && p.dk_win <= 2500);
-  const top10Cands = avail.filter(p => p.dk_top10 && p.dk_top10 >= -120 && p.dk_top10 <= 300 && p.top10 > 25);
-  const frlCands = avail.filter(p => p.dk_frl && p.dk_frl >= 300 && p.dk_frl <= 1200 && (p.sg_ott||0) > 0.3);
-
-  const legs = [];
-
-  // Leg 1: best value win bet in 400-2500 range
-  const winLeg = candidates.sort((a,b) => b.edge_vs_book - a.edge_vs_book)[0];
-  if (winLeg) legs.push({
-    type: 'Win', player: winLeg.name, odds: winLeg.dk_win,
-    reason: `${winLeg.win.toFixed(1)}% win probability — model edge vs book`
-  });
-
-  // Leg 2: best top-10 value
-  const t10Leg = top10Cands.sort((a,b) => b.top10 - a.top10).find(p => p.name !== winLeg?.name);
-  if (t10Leg) legs.push({
-    type: 'Top 10', player: t10Leg.name, odds: t10Leg.dk_top10,
-    reason: `${t10Leg.top10.toFixed(1)}% top-10 probability — strong course fit`
-  });
-
-  // Leg 3: FRL value pick
-  const frlLeg = frlCands.sort((a,b) => (b.sg_ott||0)-(a.sg_ott||0)).find(p => p.name !== winLeg?.name && p.name !== t10Leg?.name);
-  if (frlLeg) legs.push({
-    type: 'FRL', player: frlLeg.name, odds: frlLeg.dk_frl,
-    reason: `Strong off-the-tee player — SG:OTT ${frlLeg.sg_ott>=0?'+':''}${(frlLeg.sg_ott||0).toFixed(2)}`
-  });
-
-  const parlayOdds = legs.length ? calcParlayOdds(legs.map(l=>({odds:l.odds}))) : null;
-  const parlayDec = legs.reduce((acc,l) => acc * americanToDecimal(l.odds), 1);
-
-  document.getElementById('parlayContent').innerHTML = legs.length ? `
-    <div style="background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:var(--radius);padding:1.25rem;color:white;margin-bottom:1rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;opacity:0.6;margin-bottom:4px;">Recommended ${legs.length}-leg parlay</div>
-          <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--gold);">${parlayOdds}</div>
-        </div>
-        <div style="text-align:right;font-size:12px;opacity:0.7;">
-          <div>$10 bet = $${((parlayDec-1)*10).toFixed(0)} profit</div>
-          <div>$25 bet = $${((parlayDec-1)*25).toFixed(0)} profit</div>
-          <div>$50 bet = $${((parlayDec-1)*50).toFixed(0)} profit</div>
-        </div>
-      </div>
-      ${legs.map((l,i) => `
-        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,0.1);">
-          <div style="background:var(--gold);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${i+1}</div>
-          <div style="flex:1;">
-            <div style="font-weight:600;font-size:13px;">${l.player} — <span style="color:var(--gold-light);">${l.type}</span></div>
-            <div style="font-size:11px;opacity:0.7;margin-top:2px;">${l.reason}</div>
-          </div>
-          <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--gold-light);">${l.odds>0?'+':''}${l.odds}</div>
-        </div>`).join('')}
-    </div>
-    <div style="font-size:12px;color:var(--text-muted);line-height:1.6;padding:10px;background:var(--cream-dark);border-radius:var(--radius-sm);">
-      <strong>Strategy:</strong> This parlay combines a win bet on a +EV player with a high-probability top-10 and a value FRL pick. The legs are partially correlated — a player leading round 1 is more likely to win and finish top 10, which slightly reduces true parlay probability vs independent legs. Bet responsibly — parlays are high variance.
-    </div>` : '<div style="color:var(--text-muted);font-size:13px;">Not enough betting data to generate a parlay recommendation this week.</div>';
-
-  // Build Your Own Parlay section
-  const parlayOptions = avail.filter(p => p.dk_win || p.dk_top10 || p.dk_frl).slice(0, 20);
-  document.getElementById('parlayBuilder').innerHTML = `
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Click a bet to add it to your parlay. Click again to remove.</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px;">
-      ${parlayOptions.map(p => `
-        <div style="border:1px solid #e5e7eb;border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;">
-          <div style="font-weight:600;margin-bottom:6px;">${p.name}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            ${p.dk_win?`<button class="parlay-leg-btn" onclick="toggleParlayLeg('${p.name}','Win',${p.dk_win})" data-key="${p.name}-Win" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--green-light);background:white;cursor:pointer;color:var(--green-dark);">Win ${p.dk_win>0?'+':''}${p.dk_win}</button>`:''}
-            ${p.dk_top10?`<button class="parlay-leg-btn" onclick="toggleParlayLeg('${p.name}','Top 10',${p.dk_top10})" data-key="${p.name}-Top 10" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--blue);background:white;cursor:pointer;color:var(--blue);">T10 ${p.dk_top10>0?'+':''}${p.dk_top10}</button>`:''}
-            ${p.dk_frl?`<button class="parlay-leg-btn" onclick="toggleParlayLeg('${p.name}','FRL',${p.dk_frl})" data-key="${p.name}-FRL" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--gold);background:white;cursor:pointer;color:var(--amber);">FRL ${p.dk_frl>0?'+':''}${p.dk_frl}</button>`:''}
-          </div>
-        </div>`).join('')}
-    </div>`;
-}
-
-function toggleParlayLeg(player, type, odds) {
-  const key = `${player}-${type}`;
-  const idx = parlayLegs.findIndex(l => l.key === key);
-  if (idx >= 0) {
-    parlayLegs.splice(idx, 1);
-    const btn = document.querySelector(`[data-key="${key}"]`);
-    if (btn) { btn.style.background='white'; btn.style.fontWeight='400'; }
-  } else {
-    parlayLegs.push({ key, player, type, odds });
-    const btn = document.querySelector(`[data-key="${key}"]`);
-    if (btn) { btn.style.background='var(--green-dark)'; btn.style.color='white'; btn.style.fontWeight='600'; }
-  }
-  updateParlayCalc();
-}
-function clearParlay() {
-  parlayLegs = [];
-  document.querySelectorAll('.parlay-leg-btn').forEach(btn => {
-    btn.style.background='white'; btn.style.fontWeight='400'; btn.style.color='';
-  });
-  updateParlayCalc();
-}
-function updateParlayCalc() {
-  const calc = document.getElementById('parlayCalc');
-  if (!parlayLegs.length) { calc.style.display='none'; return; }
-  calc.style.display='block';
-  const parlayOdds = calcParlayOdds(parlayLegs);
-  const parlayDec = parlayLegs.reduce((acc,l) => acc * americanToDecimal(l.odds), 1);
-  document.getElementById('parlayOdds').textContent = parlayOdds;
-  document.getElementById('parlayLegs').innerHTML = parlayLegs.map(l =>
-    `<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--cream-dark);">
-      <span><strong>${l.player}</strong> — ${l.type}</span>
-      <span style="font-family:'DM Mono',monospace;font-weight:600;color:${l.odds>0?'#15803d':'var(--red)'};">${l.odds>0?'+':''}${l.odds}</span>
-    </div>`).join('') +
-    `<div style="font-size:11px;color:var(--text-muted);margin-top:8px;">$10 → $${((parlayDec-1)*10).toFixed(0)} profit &nbsp;|&nbsp; $25 → $${((parlayDec-1)*25).toFixed(0)} profit &nbsp;|&nbsp; $50 → $${((parlayDec-1)*50).toFixed(0)} profit</div>`;
-}
-
-// ── INIT ─────────────────────────────────────────────────────────
-initState();
-loadData();
-</script>
-</body>
-</html>
