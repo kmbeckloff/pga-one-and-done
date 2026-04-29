@@ -590,11 +590,17 @@ function saveCols() { localStorage.setItem('sb_cols', JSON.stringify([...activeC
 
 function isUsed(name) { return usedPlayers.has(name); }
 function toggleUsed(name) {
-  if (usedPlayers.has(name)) usedPlayers.delete(name);
-  else usedPlayers.add(name);
+  if (!name) return;
+  const cleanName = String(name).trim();
+  if (!cleanName) return;
+  if (usedPlayers.has(cleanName)) usedPlayers.delete(cleanName);
+  else usedPlayers.add(cleanName);
   saveUsed();
   document.getElementById('hUsed').textContent = usedPlayers.size;
   renderAll();
+  // Re-render the used manager if it's visible
+  const usedTab = document.getElementById('tab-used');
+  if (usedTab && usedTab.style.display !== 'none') renderUsedMgr();
 }
 function clearAllUsed() {
   if (!confirm('Clear all used players?')) return;
@@ -913,7 +919,7 @@ function renderPicks() {
       </div>
       <div class="pick-actions">
         <span class="rec-pill ${rec.c}">${rec.l}</span>
-        <button class="mark-btn" onclick="toggleUsed('${p.name}')">Mark used</button>
+        <button class="mark-btn" data-name="${p.name.replace(/'/g,\"&#39;\")}" onclick="toggleUsed(this.dataset.name)">Mark used</button>
       </div>
     </div>`;
   }).join('');
@@ -963,7 +969,7 @@ function renderTable() {
     const rowCls = p.used?'used-row':i<3?'top3-row':'';
     const cells = cols.map(c=>{
       if (c.special==='dna') return `<td>${dnaBar(p.dna)}</td>`;
-      if (c.special==='status') return `<td style="white-space:nowrap;"><span style="font-size:11px;font-weight:600;color:${p.used?'var(--red)':'#15803d'};">${p.used?'Used':'Available'}</span> <button class="mark-btn ${p.used?'unmark':''}" onclick="toggleUsed('${p.name}')">${p.used?'Unmark':'Mark used'}</button></td>`;
+      if (c.special==='status') return `<td style="white-space:nowrap;"><span style="font-size:11px;font-weight:600;color:${p.used?'var(--red)':'#15803d'};">${p.used?'Used':'Available'}</span> <button class="mark-btn ${p.used?'unmark':''}" data-name="${p.name.replace(/'/g,'&#39;')}" onclick="toggleUsed(this.dataset.name)">${p.used?'Unmark':'Mark used'}</button></td>`;
       if (c.key==='name') return `<td style="font-weight:${p.used?400:600};">${p.name}</td>`;
       if (c.key==='owgr') return `<td>${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:'<span class="cell-neutral">—</span>'}</td>`;
       const val = p[c.key];
@@ -1060,16 +1066,32 @@ function renderMatchups(matchupData) {
 // ── USED MANAGER ─────────────────────────────────────────────────
 function renderUsedMgr() {
   document.getElementById('usedCount').textContent = usedPlayers.size;
+
+  // Chips
   document.getElementById('usedChips').innerHTML = [...usedPlayers].map(n=>
-    `<div class="used-chip">${n} <button onclick="toggleUsed('${n}')" title="Remove">✕</button></div>`
+    `<div class="used-chip">${n} <button class="chip-remove" data-name="${n.replace(/"/g,'&quot;')}" title="Remove">✕</button></div>`
   ).join('') || '<span style="font-size:12px;color:var(--text-muted);">No players used yet</span>';
+
+  // Player list
   const search = (document.getElementById('usedSearch').value||'').toLowerCase();
   const filtered = allPlayers.filter(p=>!search||p.name.toLowerCase().includes(search));
   document.getElementById('usedList').innerHTML = filtered.map(p=>`
-    <div class="used-item ${p.used?'is-used':''}">
+    <div class="used-item ${p.used?'is-used':''}" data-name="${p.name.replace(/"/g,'&quot;')}">
       <span style="font-weight:${p.used?600:400};color:${p.used?'var(--red)':'var(--text)'};">${p.name} ${p.owgr?`<span class="owgr-badge">#${p.owgr}</span>`:''}</span>
-      <button class="${p.used?'btn-unmark':'btn-mark'}" onclick="toggleUsed('${p.name}')">${p.used?'Unmark':'Mark used'}</button>
+      <button class="toggle-used-btn ${p.used?'btn-unmark':'btn-mark'}" data-name="${p.name.replace(/"/g,'&quot;')}">${p.used?'Unmark':'Mark used'}</button>
     </div>`).join('');
+
+  // Event delegation for chips
+  document.getElementById('usedChips').onclick = (e) => {
+    const btn = e.target.closest('.chip-remove');
+    if (btn) { toggleUsed(btn.dataset.name); }
+  };
+
+  // Event delegation for list
+  document.getElementById('usedList').onclick = (e) => {
+    const btn = e.target.closest('.toggle-used-btn');
+    if (btn) { toggleUsed(btn.dataset.name); }
+  };
 }
 
 // ── COLUMN PICKER ────────────────────────────────────────────────
