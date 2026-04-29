@@ -19,22 +19,32 @@ export default async function handler(req, res) {
   const sa = (v) => Array.isArray(v) ? v : [];
 
   try {
-    const [preds, decomp, betWin, sg, rankings, betT10, betMC, betFRL, mu] = await Promise.all([
+    // Batch 1 — critical data only (3 calls)
+    const [preds, decomp, betWin] = await Promise.all([
       sf(`https://feeds.datagolf.com/preds/pre-tournament?tour=pga&dead_heat=no&odds_format=percent&file_format=json&key=${key}`),
       sf(`https://feeds.datagolf.com/preds/player-decompositions?tour=pga&file_format=json&key=${key}`),
-      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=win&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=win&odds_format=american&file_format=json&key=${key}`)
+    ]);
+
+    if (!decomp.players) {
+      return res.status(500).json({ error: 'No player data from DataGolf. Check your API key.' });
+    }
+
+    // Batch 2 — supplemental data (3 calls)
+    const [sg, rankings, betT10] = await Promise.all([
       sf(`https://feeds.datagolf.com/preds/skill-ratings?display=value&file_format=json&key=${key}`),
       sf(`https://feeds.datagolf.com/preds/get-dg-rankings?file_format=json&key=${key}`),
-      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`),
+      sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=top_10&odds_format=american&file_format=json&key=${key}`)
+    ]);
+
+    // Batch 3 — optional betting markets (3 calls)
+    const [betMC, betFRL, mu] = await Promise.all([
       sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=make_cut&odds_format=american&file_format=json&key=${key}`),
       sf(`https://feeds.datagolf.com/betting-tools/outrights?tour=pga&market=frl&odds_format=american&file_format=json&key=${key}`),
       sf(`https://feeds.datagolf.com/betting-tools/matchups?tour=pga&market=tournament_matchups&odds_format=american&file_format=json&key=${key}`)
     ]);
 
-    if (!decomp.players) {
-      return res.status(500).json({ error: 'No player data from DataGolf. Check your API key in Vercel environment variables.' });
-    }
-
+    // Build lookup maps
     const predsMap = {};
     sa(preds.baseline).forEach(p => {
       if (!p) return;
@@ -131,12 +141,16 @@ export default async function handler(req, res) {
         driving_distance: s.driving_dist ?? null,
         driving_accuracy: s.driving_acc ?? null,
         dk_win, dk_top10, dk_mc, dk_frl,
-        fanduel_win: bw.fanduel || null, caesars_win: bw.caesars || null,
-        betmgm_win: bw.betmgm || null, pinnacle_win: bw.pinnacle || null,
+        fanduel_win: bw.fanduel || null,
+        caesars_win: bw.caesars || null,
+        betmgm_win: bw.betmgm || null,
+        pinnacle_win: bw.pinnacle || null,
         datagolf_baseline: (bw.datagolf || {}).baseline || null,
-        fanduel_frl: bf.fanduel || null, caesars_frl: bf.caesars || null,
+        fanduel_frl: bf.fanduel || null,
+        caesars_frl: bf.caesars || null,
         datagolf_frl: (bf.datagolf || {}).baseline || null,
-        book_implied: bookImp, edge_vs_book: edge,
+        book_implied: bookImp,
+        edge_vs_book: edge,
         reasons: reasons.slice(0, 4)
       };
     }).filter(Boolean);
